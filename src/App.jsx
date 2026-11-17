@@ -69,9 +69,7 @@ function App() {
 
     return (
       <div className="placeholder-content">
-        <span className="placeholder-icon">{TABS.find(t => t.id === activeTab)?.icon}</span>
         <p>{PLACEHOLDERS[activeTab]}</p>
-        <span className="coming-soon">Coming Soon</span>
       </div>
     )
   }
