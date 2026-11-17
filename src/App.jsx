@@ -36,35 +36,83 @@ function App() {
     }
   }
 
+  const handleExampleClick = (exampleUrl) => {
+    setUrl(exampleUrl)
+  }
+
   return (
     <div className="container">
-      <header>
-        <h1>README Explainer</h1>
-        <p className="subtitle">Paste a GitHub repository URL to get a beginner-friendly explanation of its README</p>
+      <header className="hero">
+        <div className="hero-badge">For Beginner Engineers</div>
+        <h1>GitHub Repo Explainer</h1>
+        <p className="subtitle">Paste any GitHub repository URL. Get a clear, beginner-friendly breakdown of what the project does, how it works, and how to use it — explained in plain English.</p>
       </header>
 
-      <form onSubmit={handleSubmit} className="analyze-form">
-        <input
-          type="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://github.com/owner/repo"
-          required
-          disabled={loading}
-        />
-        <button type="submit" disabled={loading || !url.trim()}>
-          {loading ? 'Analyzing...' : 'Explain README'}
+      <form onSubmit={handleSubmit} className="analyze-form" noValidate>
+        <div className="input-wrapper">
+          <label htmlFor="repo-url" className="visually-hidden">GitHub Repository URL</label>
+          <input
+            id="repo-url"
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://github.com/owner/repo"
+            required
+            disabled={loading}
+            autoComplete="off"
+            autoFocus
+          />
+          {url && !loading && (
+            <button
+              type="button"
+              className="clear-btn"
+              onClick={() => setUrl('')}
+              aria-label="Clear URL"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <button type="submit" className="submit-btn" disabled={loading || !url.trim()}>
+          {loading ? (
+            <>
+              <span className="spinner" aria-hidden="true"></span>
+              <span>Analyzing Repository...</span>
+            </>
+          ) : (
+            'Explain This Repo'
+          )}
         </button>
       </form>
 
-      {error && <div className="error">{error}</div>}
+      <div className="examples" aria-label="Example repositories">
+        <span className="examples-label">Try an example:</span>
+        <button type="button" className="example-btn" onClick={() => handleExampleClick('https://github.com/vercel/next.js')}>Next.js</button>
+        <button type="button" className="example-btn" onClick={() => handleExampleClick('https://github.com/facebook/react')}>React</button>
+        <button type="button" className="example-btn" onClick={() => handleExampleClick('https://github.com/vitejs/vite')}>Vite</button>
+        <button type="button" className="example-btn" onClick={() => handleExampleClick('https://github.com/tailwindlabs/tailwindcss')}>Tailwind CSS</button>
+      </div>
 
-      {explanation && (
-        <div className="result">
-          <h2>Explanation</h2>
-          <div className="explanation">{explanation}</div>
+      {error && (
+        <div className="error" role="alert">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2"/><path d="M10 6v6M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>{error}</span>
         </div>
       )}
+
+      {explanation && (
+        <article className="result" tabIndex="-1">
+          <header className="result-header">
+            <h2>Repository Breakdown</h2>
+            <span className="result-badge">AI Generated</span>
+          </header>
+          <div className="explanation">{explanation}</div>
+        </article>
+      )}
+
+      <footer className="footer">
+        <p>Built for beginner engineers · Powered by <a href="https://ai.google.dev/gemini-api" target="_blank" rel="noopener noreferrer">Google Gemini</a> · Open source on <a href="https://github.com/agrwl-utkarsh/mini2" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+      </footer>
     </div>
   )
 }
