@@ -12,10 +12,37 @@ import type {
 
 export type { AnalyzeRequest, AnalyzeResponse, ChatRequest, ChatResponse }
 
-const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8003/api' : '/api')
+export function getApiBase(): string {
+  if (typeof window !== 'undefined') {
+    const custom = localStorage.getItem('reposense_backend_url')
+    if (custom) return custom.replace(/\/+$/, '')
+  }
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, '')
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:8003/api'
+  }
+  return '/api'
+}
+
+export function setCustomApiUrl(url: string) {
+  if (typeof window !== 'undefined') {
+    let clean = url.trim().replace(/\/+$/, '')
+    if (clean && !clean.endsWith('/api')) {
+      clean += '/api'
+    }
+    if (clean) {
+      localStorage.setItem('reposense_backend_url', clean)
+    } else {
+      localStorage.removeItem('reposense_backend_url')
+    }
+  }
+}
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const url = `${API_BASE}${endpoint}`
+  const base = getApiBase()
+  const url = `${base}${endpoint}`
   let response: Response
   try {
     response = await fetch(url, {
@@ -26,7 +53,11 @@ async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T>
       ...options,
     })
   } catch (err: any) {
-    throw new Error(`Cannot connect to backend API at ${API_BASE}. Make sure the backend server is running and CORS/VITE_API_URL is configured.`)
+    throw new Error(`Cannot connect to backend API at ${base}. Make sure your Render backend is running and CORS is configured.`)
+  }
+
+  if (response.status === 405) {
+    throw new Error(`HTTP 405: Vercel static hosting intercepted the API request because VITE_API_URL is not configured. Please configure your Render backend URL below.`)
   }
 
   if (!response.ok) {

@@ -1,8 +1,8 @@
-﻿import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GitBranch, ArrowRight, CheckCircle, AlertCircle } from 'lucide-react'
+import { GitBranch, ArrowRight, CheckCircle, AlertCircle, Settings, Check } from 'lucide-react'
 import { Button, Input } from '../common'
-import { isValidGithubUrl, extractRepoInfo } from '../../services/api'
+import { isValidGithubUrl, extractRepoInfo, getApiBase, setCustomApiUrl } from '../../services/api'
 import { useAnalyzeRepo } from '../../hooks/useRepo'
 import { useRepo } from '../../context/RepoContext'
 
@@ -10,9 +10,16 @@ export function URLInput() {
   const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const [isValid, setIsValid] = useState(false)
+  const [showConfig, setShowConfig] = useState(false)
+  const [backendUrl, setBackendUrl] = useState('')
+  const [savedBackend, setSavedBackend] = useState(false)
   const navigate = useNavigate()
   const { mutate: analyze, isPending } = useAnalyzeRepo()
   const { setRepo } = useRepo()
+
+  useEffect(() => {
+    setBackendUrl(getApiBase())
+  }, [])
 
   const validateUrl = (value: string) => {
     setUrl(value)
@@ -60,11 +67,14 @@ export function URLInput() {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
-        // Navigate to analysis page after successful API call
         navigate('/analyze')
       },
       onError: (err: any) => {
-        setError(err?.message || 'Failed to reach backend server. Please verify the backend is running.')
+        const msg = err?.message || 'Failed to reach backend server. Please verify your backend URL.'
+        setError(msg)
+        if (msg.includes('405') || msg.includes('Cannot connect')) {
+          setShowConfig(true)
+        }
       },
     })
   }
@@ -82,7 +92,7 @@ export function URLInput() {
           placeholder='https://github.com/owner/repository'
           className='pl-12 pr-4 py-3.5 text-lg bg-navy-900/80 border-navy-700 focus:border-cyan-500'
           disabled={isPending}
-          error={error}
+          error={error ? ' ' : undefined}
           aria-label='GitHub repository URL'
           autoComplete='off'
           autoFocus
@@ -95,9 +105,76 @@ export function URLInput() {
       </div>
 
       {error && (
-        <div className='mt-3 flex items-center gap-2 text-red-400 text-sm' role='alert'>
-          <AlertCircle className='w-4 h-4 flex-shrink-0' />
-          <span>{error}</span>
+        <div className='mt-3 p-3.5 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 text-sm text-left' role='alert'>
+          <div className='flex items-start gap-2.5'>
+            <AlertCircle className='w-4 h-4 flex-shrink-0 mt-0.5 text-red-400' />
+            <div className='flex-1'>
+              <p className='font-medium'>{error}</p>
+              {!showConfig && (
+                <button
+                  type='button'
+                  onClick={() => setShowConfig(true)}
+                  className='mt-2 inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 underline font-medium'
+                >
+                  <Settings className='w-3.5 h-3.5' />
+                  Configure Render Backend URL
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfig && (
+        <div className='mt-4 p-4 rounded-xl bg-navy-900/90 border border-cyan-500/40 text-left space-y-3'>
+          <div className='flex items-center justify-between'>
+            <span className='text-xs font-semibold text-cyan-400 flex items-center gap-1.5'>
+              <Settings className='w-3.5 h-3.5' />
+              Backend API URL Configuration
+            </span>
+            <button
+              type='button'
+              onClick={() => setShowConfig(false)}
+              className='text-xs text-navy-400 hover:text-navy-200'
+            >
+              Hide
+            </button>
+          </div>
+          <p className='text-xs text-navy-400'>
+            Enter your deployed Render backend URL (e.g., <code className='text-cyan-300'>https://reposense-api.onrender.com</code>):
+          </p>
+          <div className='flex gap-2'>
+            <input
+              type='url'
+              value={backendUrl}
+              onChange={(e) => {
+                setBackendUrl(e.target.value)
+                setSavedBackend(false)
+              }}
+              placeholder='https://your-service.onrender.com'
+              className='flex-1 px-3 py-2 bg-navy-950 border border-navy-700 rounded-lg text-sm text-navy-100 placeholder-navy-600 focus:outline-none focus:border-cyan-500'
+            />
+            <Button
+              type='button'
+              size='sm'
+              variant='primary'
+              onClick={() => {
+                if (backendUrl.trim()) {
+                  setCustomApiUrl(backendUrl)
+                  setSavedBackend(true)
+                  setError('')
+                  setTimeout(() => setSavedBackend(false), 2500)
+                }
+              }}
+            >
+              {savedBackend ? <Check className='w-4 h-4' /> : 'Save'}
+            </Button>
+          </div>
+          {savedBackend && (
+            <p className='text-xs text-green-400 flex items-center gap-1'>
+              <Check className='w-3.5 h-3.5' /> Backend URL saved! Now click Analyze Repository.
+            </p>
+          )}
         </div>
       )}
 
@@ -115,7 +192,18 @@ export function URLInput() {
         </Button>
       </div>
 
-      <p className='mt-6 text-center text-sm text-navy-500'>
+      <div className='mt-4 flex items-center justify-center gap-2'>
+        <button
+          type='button'
+          onClick={() => setShowConfig(!showConfig)}
+          className='inline-flex items-center gap-1 text-xs text-navy-500 hover:text-cyan-400 transition-colors'
+        >
+          <Settings className='w-3.5 h-3.5' />
+          {showConfig ? 'Hide Backend Settings' : 'Backend Settings'}
+        </button>
+      </div>
+
+      <p className='mt-4 text-center text-sm text-navy-500'>
         Supports public GitHub repositories only. Private repos and GitHub Enterprise not supported.
       </p>
     </form>
