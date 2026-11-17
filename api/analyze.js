@@ -84,7 +84,8 @@ ${readme}`
   })
 
   if (!response.ok) {
-    throw new Error(`Groq API error: ${response.status}`)
+    const errText = await response.text()
+    throw new Error(`Groq API error ${response.status}: ${errText}`)
   }
 
   const data = await response.json()
