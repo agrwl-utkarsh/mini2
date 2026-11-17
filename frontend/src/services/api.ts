@@ -23,7 +23,7 @@ export function getApiBase(): string {
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return 'http://localhost:8003/api'
   }
-  return '/api'
+  return 'https://mini2-kfhy.onrender.com/api'
 }
 
 export function setCustomApiUrl(url: string) {
