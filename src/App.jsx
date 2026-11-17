@@ -107,6 +107,43 @@ function App() {
           <div className="explanation">{explanation}</div>
         </article>
       )}
+
+      <section className="future-features" aria-label="Planned features">
+        <h3 className="future-title">Planned Features</h3>
+        <div className="future-grid">
+          <button type="button" className="future-btn" disabled>
+            <span className="future-icon">📊</span>
+            <span className="future-label">Architecture Flow Diagram</span>
+            <span className="future-badge">Planned</span>
+          </button>
+          <button type="button" className="future-btn" disabled>
+            <span className="future-icon">💬</span>
+            <span className="future-label">AI Chatbot Q&A</span>
+            <span className="future-badge">Planned</span>
+          </button>
+          <button type="button" className="future-btn" disabled>
+            <span className="future-icon">🔍</span>
+            <span className="future-label">Code Explorer</span>
+            <span className="future-badge">Planned</span>
+          </button>
+          <button type="button" className="future-btn" disabled>
+            <span className="future-icon">📁</span>
+            <span className="future-label">File Tree Visualization</span>
+            <span className="future-badge">Planned</span>
+          </button>
+          <button type="button" className="future-btn" disabled>
+            <span className="future-icon">⚡</span>
+            <span className="future-label">Dependency Graph</span>
+            <span className="future-badge">Planned</span>
+          </button>
+          <button type="button" className="future-btn" disabled>
+            <span className="future-icon">🧪</span>
+            <span className="future-label">Test Coverage Insights</span>
+            <span className="future-badge">Planned</span>
+          </button>
+        </div>
+        <p className="future-note">These features are in our roadmap for future development.</p>
+      </section>
     </div>
   )
 }
