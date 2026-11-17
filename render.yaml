@@ -8,7 +8,7 @@ services:
     envVars:
       - key: GROQ_API_KEY
         sync: false
-      - key: CORS_ORIGINS
+      - key: CORS_ORIGINS_STR
         value: "https://mini2-97sb1acoq-uagarwal212-5073.vercel.app,http://localhost:5173"
       - key: REPO_BASE_PATH
         value: "/tmp/reposense"

@@ -1,6 +1,6 @@
 import os
 from typing import List, Optional
-from pydantic import BaseSettings
+from pydantic import BaseSettings, validator
 
 
 class Settings(BaseSettings):
@@ -8,8 +8,12 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api"
     PROJECT_NAME: str = "RepoSense"
     
-    # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    # CORS - use string and parse manually to avoid pydantic v1 issues
+    CORS_ORIGINS_STR: str = "http://localhost:5173,http://localhost:3000"
+    
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        return [origin.strip() for origin in self.CORS_ORIGINS_STR.split(",") if origin.strip()]
     
     # Repository storage
     REPO_BASE_PATH: str = "/tmp/reposense"
