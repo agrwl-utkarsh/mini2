@@ -1,4 +1,4 @@
-# GitHub Repo Explainer
+# GitHub Repository Explainer
 
 Paste a GitHub URL, get a beginner-friendly explanation of the repository using AI with automatic fallback.
 

@@ -77,7 +77,7 @@ function App() {
   return (
     <div className="container">
       <header className="hero">
-        <h1>GitHub Repo Explainer</h1>
+        <h1>GitHub Repository Explainer</h1>
         <p className="subtitle">Paste any GitHub repository URL. Get a clear, beginner-friendly breakdown of what the project does, how it works, and how to use it — explained in plain English.</p>
       </header>
 

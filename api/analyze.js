@@ -281,7 +281,7 @@ async function callOpenRouter(prompt, apiKey, model) {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
       'HTTP-Referer': 'https://github.com/agrwl-utkarsh/mini2',
-      'X-Title': 'GitHub Repo Explainer',
+      'X-Title': 'GitHub Repository Explainer',
     },
     body: JSON.stringify({
       model,
