@@ -12,20 +12,26 @@ import type {
 
 export type { AnalyzeRequest, AnalyzeResponse, ChatRequest, ChatResponse }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8003/api' : '/api')
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-    ...options,
-  })
+  const url = `${API_BASE}${endpoint}`
+  let response: Response
+  try {
+    response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+      ...options,
+    })
+  } catch (err: any) {
+    throw new Error(`Cannot connect to backend API at ${API_BASE}. Make sure the backend server is running and CORS/VITE_API_URL is configured.`)
+  }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Request failed' }))
-    throw new Error(error.message || `HTTP ${response.status}`)
+    const error = await response.json().catch(() => ({ message: `Request failed with HTTP ${response.status}` }))
+    throw new Error(error.detail || error.message || `HTTP ${response.status}`)
   }
 
   if (response.status === 204) {

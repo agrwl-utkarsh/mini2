@@ -16,7 +16,11 @@ export function URLInput() {
 
   const validateUrl = (value: string) => {
     setUrl(value)
-    const valid = isValidGithubUrl(value)
+    let checkValue = value.trim()
+    if (checkValue && !checkValue.startsWith('http://') && !checkValue.startsWith('https://')) {
+      checkValue = 'https://' + checkValue
+    }
+    const valid = isValidGithubUrl(checkValue)
     setIsValid(valid)
     if (value && !valid) {
       setError('Please enter a valid GitHub repository URL (e.g., https://github.com/owner/repo)')
@@ -27,21 +31,40 @@ export function URLInput() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (!isValid || isPending) return
+    let trimmed = url.trim()
+    if (!trimmed) {
+      setError('Please enter a GitHub repository URL')
+      return
+    }
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      trimmed = 'https://' + trimmed
+      setUrl(trimmed)
+    }
 
-    const repoInfo = extractRepoInfo(url)
-    analyze({ url }, {
+    if (!isValidGithubUrl(trimmed)) {
+      setError('Please enter a valid GitHub repository URL (e.g., https://github.com/owner/repo)')
+      return
+    }
+
+    if (isPending) return
+
+    setError('')
+    const repoInfo = extractRepoInfo(trimmed)
+    analyze({ url: trimmed }, {
       onSuccess: (response) => {
         setRepo({
           id: response.repoId,
           name: repoInfo?.name || 'Unknown',
-          url,
-          status: 'cloning',
+          url: trimmed,
+          status: response.status || 'cloning',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
         // Navigate to analysis page after successful API call
         navigate('/analyze')
+      },
+      onError: (err: any) => {
+        setError(err?.message || 'Failed to reach backend server. Please verify the backend is running.')
       },
     })
   }
@@ -71,7 +94,7 @@ export function URLInput() {
         )}
       </div>
 
-      {error && !isValid && (
+      {error && (
         <div className='mt-3 flex items-center gap-2 text-red-400 text-sm' role='alert'>
           <AlertCircle className='w-4 h-4 flex-shrink-0' />
           <span>{error}</span>

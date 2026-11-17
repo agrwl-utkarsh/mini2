@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
 import uuid
 import threading
@@ -64,8 +64,8 @@ def process_repository_sync(repo_id: str, url: str):
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-async def analyze_repo(request: AnalyzeRequest):
-    """Start analyzing a GitHub repository (synchronous for demo)."""
+async def analyze_repo(request: AnalyzeRequest, background_tasks: BackgroundTasks):
+    """Start analyzing a GitHub repository in the background."""
     url = str(request.url)
     
     # Validate GitHub URL
@@ -79,16 +79,16 @@ async def analyze_repo(request: AnalyzeRequest):
         id=repo_id,
         name=url.split("/")[-1].replace(".git", ""),
         url=url,
-        status="pending",
+        status="cloning",
         created_at=__import__('datetime').datetime.now(),
         updated_at=__import__('datetime').datetime.now()
     )
     repos[repo_id] = repo
     
-    # Process synchronously (for demo - use background tasks in production)
-    process_repository_sync(repo_id, url)
+    # Process asynchronously in background
+    background_tasks.add_task(process_repository_sync, repo_id, url)
     
-    return AnalyzeResponse(repo_id=repo_id, status="complete")
+    return AnalyzeResponse(repo_id=repo_id, status="cloning")
 
 
 @router.get("/{repo_id}/status", response_model=RepoStatusResponse)
