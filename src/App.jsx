@@ -62,7 +62,7 @@ function App() {
       ) : (
         <div className="empty-state">
           <span className="empty-icon">🧠</span>
-          <p>Enter a GitHub repository URL and click "Explain This Repo" to get an AI-powered breakdown.</p>
+          <p>Enter a GitHub repository URL and click "Explain This Repository" to get an AI-powered breakdown.</p>
         </div>
       )
     }
@@ -77,7 +77,7 @@ function App() {
   return (
     <div className="container">
       <header className="hero">
-        <h1>GitHub Repo Explainer</h1>
+        <h1>GitHub Repository Explainer</h1>
         <p className="subtitle">Paste any GitHub repository URL. Get a clear, beginner-friendly breakdown of what the project does, how it works, and how to use it — explained in plain English.</p>
       </header>
 
@@ -89,7 +89,7 @@ function App() {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://github.com/owner/repo"
+            placeholder="https://github.com/owner/repository"
             required
             disabled={loading}
             autoComplete="off"
@@ -113,7 +113,7 @@ function App() {
               <span>Analyzing Repository...</span>
             </>
           ) : (
-            'Explain This Repo'
+            'Explain This Repository'
           )}
         </button>
       </form>

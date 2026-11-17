@@ -55,7 +55,7 @@ def create_deck():
         tf.word_wrap = True
         tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
         p = tf.paragraphs[0]
-        p.text = f"{note} · GitHub Repo Explainer" if note else "GitHub Repo Explainer"
+        p.text = f"{note} · GitHub Repository Explainer" if note else "GitHub Repository Explainer"
         p.font.name = 'Arial'
         p.font.size = Pt(9.5)
         p.font.color.rgb = c_text_soft
@@ -121,7 +121,7 @@ def create_deck():
 
     # --- SLIDE 1: INTRODUCTION ---
     s1 = prs.slides.add_slide(blank_layout)
-    add_header(s1, "Slide 01 · Welcome & Overview", "GitHub Repo Explainer",
+    add_header(s1, "Slide 01 · Welcome & Overview", "GitHub Repository Explainer",
                "A friendly, everyday guide that turns complex open-source software projects into clear, conversational English anyone can understand.")
     create_card(s1, 0.8, 2.15, 3.65, 4.35, "The Core Mission", "Making Code Approachable",
                 "Think of it like having an experienced, patient friend sitting right beside you, explaining what a codebase does without intimidating words.", blue_accent=True)

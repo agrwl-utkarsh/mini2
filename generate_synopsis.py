@@ -32,7 +32,7 @@ class NumberedCanvas(canvas.Canvas):
         
         # Don't draw header/footer on title page
         if self._pageNumber > 1:
-            self.drawString(54, 745, "Project Synopsis — GitHub Repo Explainer")
+            self.drawString(54, 745, "Project Synopsis — GitHub Repository Explainer")
             self.setStrokeColor(colors.HexColor("#d1d5db"))
             self.setLineWidth(0.5)
             self.line(54, 737, 612 - 54, 737)
@@ -167,7 +167,7 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     story.append(Spacer(1, 10))
     story.append(Paragraph("PROJECT SYNOPSIS", ParagraphStyle('PreTitle', fontName='Times-Bold', fontSize=12, leading=14, alignment=TA_CENTER, textColor=colors.HexColor("#2563eb"))))
     story.append(Spacer(1, 6))
-    story.append(Paragraph("GitHub Repo Explainer: A Web Tool to Explain Complex Code Repositories in Simple English", title_style))
+    story.append(Paragraph("GitHub Repository Explainer: A Web Tool to Explain Complex Code Repositories in Simple English", title_style))
     story.append(Paragraph("A Minor Project for B.Tech Computer Science (2nd Year)", sub_title_style))
     story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#d1d5db"), spaceAfter=14))
 
@@ -213,7 +213,7 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     story.append(Paragraph("Abstract", h1_style))
     story.append(Paragraph(
         "When engineering students and junior developers start exploring open-source projects on GitHub, they often feel completely overwhelmed. Most project README files are written by experienced programmers who use very technical terms, skip basic explanations, and jump straight into long lists of installation commands. Beginners find it difficult to understand what the project actually does, how it works in real life, and why someone made it. "
-        "To solve this problem, we built <b>GitHub Repo Explainer</b>. It is a simple website where a user can paste any GitHub project link and click a button. In just a few seconds, our web app fetches the project documentation, sends it to an AI model with special teaching instructions, and shows a friendly, 5-paragraph explanation in plain English using simple real-world analogies. To make sure the site never crashes, we added an automatic backup system: if one AI service is busy or down, it automatically tries another one (like Grok, Gemini, DeepSeek, or OpenRouter). The website is built using React on the frontend and runs on Vercel without needing any database. In this synopsis, we explain the problem, our design, how we built the system, and what we learned.",
+        "To solve this problem, we built <b>GitHub Repository Explainer</b>. It is a simple website where a user can paste any GitHub project link and click a button. In just a few seconds, our web app fetches the project documentation, sends it to an AI model with special teaching instructions, and shows a friendly, 5-paragraph explanation in plain English using simple real-world analogies. To make sure the site never crashes, we added an automatic backup system: if one AI service is busy or down, it automatically tries another one (like Grok, Gemini, DeepSeek, or OpenRouter). The website is built using React on the frontend and runs on Vercel without needing any database. In this synopsis, we explain the problem, our design, how we built the system, and what we learned.",
         body_style
     ))
     story.append(Spacer(1, 8))
