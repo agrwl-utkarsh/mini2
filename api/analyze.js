@@ -49,34 +49,46 @@ async function fetchReadme(owner, repo) {
 }
 
 async function explainReadme(readme) {
-  const prompt = `You are a senior software engineer teaching a complete beginner. Explain this GitHub repository in a way that someone with basic coding knowledge can understand.
+  // Truncate very long READMEs to avoid token limits and copying
+  const maxReadmeLength = 8000
+  const truncatedReadme = readme.length > maxReadmeLength 
+    ? readme.slice(0, maxReadmeLength) + '\n\n[README truncated for length...]'
+    : readme
 
-Write a comprehensive explanation in PARAGRAPHS (not bullet points). Do NOT copy or summarize the README directly. Instead, explain the concepts in your own words as if you're teaching someone.
+  const prompt = `You are a senior software engineer mentoring a junior developer. Your task is to explain this GitHub repository in a way that teaches them something new.
 
-Cover these topics thoroughly:
+⚠️ CRITICAL RULES:
+- DO NOT copy, quote, or paraphrase the README directly
+- DO NOT output the README content in any form
+- DO NOT use bullet points or numbered lists
+- DO NOT summarize the README section-by-section
+- Write ONLY in flowing, natural PARAGRAPHS (minimum 5-6 paragraphs)
+- Explain concepts in YOUR OWN WORDS as if teaching face-to-face
 
-1. **What this project actually does** - Explain the problem it solves in plain English. Use analogies if helpful. What would a user see/experience?
+What to cover (weave naturally into paragraphs):
 
-2. **How it works (high-level)** - Explain the core idea/architecture simply. What are the main components? How do they talk to each other?
+1. **What problem this solves** - Start with the "why". What frustration or need led to this project? Paint a picture of the before/after.
 
-3. **Key features** - What can it do? Why would someone use it? Explain each major feature in simple terms.
+2. **How it works conceptually** - Explain the core idea without technical jargon. Use analogies. "Think of it like..." 
 
-4. **How to use/install it** - If the README mentions installation, explain the steps in beginner-friendly language. What prerequisites are needed?
+3. **Key capabilities** - What can someone actually DO with this? Why would they choose it over alternatives?
 
-5. **Important concepts a beginner should know** - Are there technical terms, patterns, or technologies mentioned (like "React", "API", "Docker", "CI/CD", "WebSocket", etc.)? Explain each one simply.
+4. **Getting started** - If there's setup involved, walk through it like you're sitting next to them. What do they need first?
 
-6. **Why this project matters** - What's the real-world use case? Who would benefit from it?
+5. **Important concepts explained** - Any technical terms (API, framework, library, deployment, etc.) - define them simply when they come up.
 
-Writing style:
-- Use complete sentences and paragraphs
-- Friendly, conversational tone
-- Define technical terms when first used
-- Avoid jargon where possible; if needed, explain it
-- Imagine you're explaining to a junior developer over coffee
-- Minimum 4-5 substantial paragraphs
+6. **Why it matters** - Real-world impact. Who uses this? What projects is it good for?
 
-README to explain:
-${readme}`
+Style: Conversational, encouraging, like a code review with a junior dev. Use "you" and "we". Avoid academic tone.
+
+❌ BAD EXAMPLE (what NOT to do):
+"This project is a React library for state management. It has features like... Installation: npm install... It uses React Context..."
+
+✅ GOOD EXAMPLE (what TO do):
+"Imagine you're building a React app and you keep passing props down three levels just to share a simple toggle state. Frustrating, right? That's exactly the problem this library solves. Instead of threading props through every component, you wrap your app in a provider once, and any component can read or update the state directly. It's like having a shared whiteboard in the room instead of passing notes through intermediaries. The core idea uses React Context under the hood — that's React's built-in way to share data without props — but this library handles all the boilerplate so you don't have to. You'd use this when your app has several components that need the same data, like a theme toggle, user authentication status, or a shopping cart. Getting started takes two minutes: install it, wrap your root component, and you're off. No complex configuration needed unless you want it."
+
+README to explain (do not copy from this):
+${truncatedReadme}`
 
   // 1. Try Grok (xAI) - if key exists
   const grokKey = process.env.GROK_API_KEY
@@ -165,11 +177,11 @@ async function callGrok(prompt, apiKey) {
     body: JSON.stringify({
       model: 'grok-beta',
       messages: [
-        { role: 'system', content: 'You are a helpful teacher who explains code to beginners in simple language.' },
+        { role: 'system', content: 'You are a senior engineer mentoring a junior developer. Explain repositories in your own words using conversational paragraphs. Never copy or summarize the README directly.' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.3,
-      max_tokens: 2000,
+      temperature: 0.7,
+      max_tokens: 3000,
     }),
   })
 
@@ -190,7 +202,7 @@ async function callGemini(prompt, apiKey, model) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 2000 },
+        generationConfig: { temperature: 0.7, maxOutputTokens: 3000 },
       }),
     }
   )
@@ -214,11 +226,11 @@ async function callDeepSeek(prompt, apiKey) {
     body: JSON.stringify({
       model: 'deepseek-chat',
       messages: [
-        { role: 'system', content: 'You are a helpful teacher who explains code to beginners in simple language.' },
+        { role: 'system', content: 'You are a senior engineer mentoring a junior developer. Explain repositories in your own words using conversational paragraphs. Never copy or summarize the README directly.' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.3,
-      max_tokens: 2000,
+      temperature: 0.7,
+      max_tokens: 3000,
     }),
   })
 
@@ -243,11 +255,11 @@ async function callOpenRouter(prompt, apiKey, model) {
     body: JSON.stringify({
       model,
       messages: [
-        { role: 'system', content: 'You are a helpful teacher who explains code to beginners in simple language.' },
+        { role: 'system', content: 'You are a senior engineer mentoring a junior developer. Explain repositories in your own words using conversational paragraphs. Never copy or summarize the README directly.' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.3,
-      max_tokens: 2000,
+      temperature: 0.7,
+      max_tokens: 3000,
     }),
   })
 
@@ -269,7 +281,7 @@ async function callHuggingFace(prompt, apiKey, model) {
     },
     body: JSON.stringify({
       inputs: prompt,
-      parameters: { temperature: 0.3, max_new_tokens: 2000, return_full_text: false },
+      parameters: { temperature: 0.7, max_new_tokens: 3000, return_full_text: false },
     }),
   })
 
