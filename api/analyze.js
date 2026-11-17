@@ -73,7 +73,7 @@ ${readme}`
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-70b-versatile',
       messages: [
         { role: 'system', content: 'You are a helpful teacher who explains code to beginners in simple language.' },
         { role: 'user', content: prompt },
