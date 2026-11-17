@@ -113,13 +113,15 @@ ${truncatedReadme}`
     }
   }
 
-  // 2. Try Gemini
+  // 2. Try Gemini (current v1beta model names)
   const geminiKey = process.env.GEMINI_API_KEY
   if (geminiKey) {
     const geminiModels = [
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-pro-latest',
+      'gemini-2.0-flash-exp',
       'gemini-1.5-flash',
       'gemini-1.5-pro',
-      'gemini-1.0-pro',
     ]
     for (const model of geminiModels) {
       try {
@@ -142,15 +144,16 @@ ${truncatedReadme}`
     }
   }
 
-  // 4. Try OpenRouter
+  // 4. Try OpenRouter (current free models as of 2025)
   const openRouterKey = process.env.OPENROUTER_API_KEY
   if (openRouterKey) {
     const openRouterModels = [
-      'meta-llama/llama-3.2-3b-instruct:free',
-      'meta-llama/llama-3.2-1b-instruct:free',
+      'meta-llama/llama-3.1-8b-instruct:free',
+      'mistralai/mistral-7b-instruct:free',
+      'google/gemma-2-9b-it:free',
+      'meta-llama/llama-3.1-70b-instruct:free',
       'microsoft/phi-3-mini-128k-instruct:free',
-      'google/gemma-2-2b-it:free',
-      'qwen/qwen-2.5-7b-instruct:free',
+      'qwen/qwen-2-7b-instruct:free',
     ]
     for (const model of openRouterModels) {
       try {
@@ -168,7 +171,8 @@ ${truncatedReadme}`
     const hfModels = [
       'meta-llama/Meta-Llama-3.1-8B-Instruct',
       'microsoft/Phi-3-mini-128k-instruct',
-      'google/gemma-2-2b-it',
+      'google/gemma-2-9b-it',
+      'mistralai/Mistral-7B-Instruct-v0.3',
     ]
     for (const model of hfModels) {
       try {
