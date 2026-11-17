@@ -90,12 +90,25 @@ Style: Conversational, encouraging, like a code review with a junior dev. Use "y
 README to explain (do not copy from this):
 ${truncatedReadme}`
 
+  const errors = []
+  const detectedKeys = []
+
+  // Debug: Check which keys are present
+  if (process.env.GROK_API_KEY) detectedKeys.push('GROK')
+  if (process.env.GEMINI_API_KEY) detectedKeys.push('GEMINI')
+  if (process.env.DEEPSEEK_API_KEY) detectedKeys.push('DEEPSEEK')
+  if (process.env.OPENROUTER_API_KEY) detectedKeys.push('OPENROUTER')
+  if (process.env.HUGGINGFACE_API_KEY) detectedKeys.push('HUGGINGFACE')
+  
+  console.log('Detected API keys:', detectedKeys.join(', ') || 'NONE')
+
   // 1. Try Grok (xAI) - if key exists
   const grokKey = process.env.GROK_API_KEY
   if (grokKey) {
     try {
       return await callGrok(prompt, grokKey)
     } catch (err) {
+      errors.push(`Grok: ${err.message}`)
       console.warn('Grok failed:', err.message)
     }
   }
@@ -112,6 +125,7 @@ ${truncatedReadme}`
       try {
         return await callGemini(prompt, geminiKey, model)
       } catch (err) {
+        errors.push(`Gemini (${model}): ${err.message}`)
         console.warn(`Gemini model ${model} failed:`, err.message)
       }
     }
@@ -123,6 +137,7 @@ ${truncatedReadme}`
     try {
       return await callDeepSeek(prompt, deepseekKey)
     } catch (err) {
+      errors.push(`DeepSeek: ${err.message}`)
       console.warn('DeepSeek failed:', err.message)
     }
   }
@@ -141,6 +156,7 @@ ${truncatedReadme}`
       try {
         return await callOpenRouter(prompt, openRouterKey, model)
       } catch (err) {
+        errors.push(`OpenRouter (${model}): ${err.message}`)
         console.warn(`OpenRouter model ${model} failed:`, err.message)
       }
     }
@@ -158,13 +174,15 @@ ${truncatedReadme}`
       try {
         return await callHuggingFace(prompt, hfKey, model)
       } catch (err) {
+        errors.push(`HuggingFace (${model}): ${err.message}`)
         console.warn(`HuggingFace model ${model} failed:`, err.message)
       }
     }
   }
 
-  // All providers failed
-  return 'README content:\n\n' + readme.slice(0, 3000) + '\n\n(AI explanation unavailable - showing raw README)'
+  // All providers failed - return debug info
+  const debugInfo = `\n\n---\nDEBUG: Detected keys: ${detectedKeys.join(', ') || 'NONE'}\nErrors:\n${errors.map(e => `• ${e}`).join('\n') || '• No providers attempted (no keys detected)'}`
+  return 'README content:\n\n' + readme.slice(0, 3000) + '\n\n(AI explanation unavailable' + debugInfo + ')'
 }
 
 async function callGrok(prompt, apiKey) {
