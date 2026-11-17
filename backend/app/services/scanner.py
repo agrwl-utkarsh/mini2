@@ -4,8 +4,10 @@ from typing import Dict, List, Set, Optional
 from app.models.schemas import FileTreeNode, RepositoryStats
 
 
-IGNORE_DIRS = {'.git', 'node_modules', 'venv', '__pycache__', 'dist', 'build', '.venv', 'env', '.env'}
-IGNORE_FILES = {'.DS_Store', 'Thumbs.db', '.gitignore', '.env'}
+IGNORE_DIRS = {'.git', 'node_modules', 'venv', '__pycache__', 'dist', 'build', '.venv', 'env', '.env', '.next'}
+IGNORE_FILES = {'.DS_Store', 'Thumbs.db', '.gitignore', '.env', 'package-lock.json', 'pnpm-lock.yaml', 'yarn.lock'}
+MAX_SCAN_DEPTH = 8
+
 
 LANGUAGE_EXTENSIONS = {
     '.py': 'Python', '.js': 'JavaScript', '.jsx': 'JavaScript', '.ts': 'TypeScript', '.tsx': 'TypeScript',
@@ -16,6 +18,7 @@ LANGUAGE_EXTENSIONS = {
     '.json': 'JSON', '.yaml': 'YAML', '.yml': 'YAML', '.md': 'Markdown',
     '.sh': 'Shell', '.bash': 'Shell', '.zsh': 'Shell', '.dockerfile': 'Dockerfile',
 }
+
 
 FRAMEWORK_INDICATORS = {
     'React': ['package.json', 'react'],
@@ -49,15 +52,17 @@ class Scanner:
     def scan(self) -> tuple[FileTreeNode, RepositoryStats]:
         """Scan repository and return file tree + stats."""
         print(f"[DEBUG] Scanning {self.repo_path}")
-        tree = self._build_tree(self.repo_path)
+        tree = self._build_tree(self.repo_path, relative_path="", depth=0)
         stats = self._compute_stats()
         print(f"[DEBUG] Scan complete: {stats.files} files, {len(stats.languages)} languages")
         return tree, stats
 
-    def _build_tree(self, path: Path, relative_path: str = "") -> FileTreeNode:
+    def _build_tree(self, path: Path, relative_path: str = "", depth: int = 0) -> FileTreeNode:
+        if depth > MAX_SCAN_DEPTH:
+            return FileTreeNode(name=path.name or "root", path=relative_path or "", type="folder", language="Other", expanded=True, children=[])
+        
         name = path.name if relative_path else path.name or "root"
         node = FileTreeNode(name=name, path=relative_path, type="folder", language="Other", expanded=True)
-        print(f"[DEBUG] Created folder node: {name}, language={node.language}")
         
         try:
             entries = sorted(path.iterdir(), key=lambda x: (x.is_file(), x.name.lower()))
@@ -76,8 +81,7 @@ class Scanner:
             if entry.is_dir():
                 if entry.name not in IGNORE_DIRS:
                     self.folder_count += 1
-                    child = self._build_tree(entry, rel)
-                    print(f"[DEBUG] Child folder: {child.name}, language={child.language}")
+                    child = self._build_tree(entry, rel, depth + 1)
                     if child.children:
                         children.append(child)
             else:
@@ -85,7 +89,6 @@ class Scanner:
                 lang = self._detect_language(entry.name)
                 size = entry.stat().st_size if entry.exists() else 0
                 file_lang = lang or "Other"
-                print(f"[DEBUG] Created file node: {entry.name}, language={file_lang}")
                 children.append(FileTreeNode(
                     name=entry.name,
                     path=rel,
