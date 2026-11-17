@@ -111,7 +111,7 @@ function App() {
       )}
 
       <footer className="footer">
-        <p>Built for beginner engineers · Powered by <a href="https://ai.google.dev/gemini-api" target="_blank" rel="noopener noreferrer">Google Gemini</a> + <a href="https://deepseek.com" target="_blank" rel="noopener noreferrer">DeepSeek</a> · Open source on <a href="https://github.com/agrwl-utkarsh/mini2" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+        <p>Built for beginner engineers · Powered by <a href="https://ai.google.dev/gemini-api" target="_blank" rel="noopener noreferrer">Google Gemini</a> · <a href="https://deepseek.com" target="_blank" rel="noopener noreferrer">DeepSeek</a> · <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer">OpenRouter</a> · <a href="https://huggingface.co" target="_blank" rel="noopener noreferrer">Hugging Face</a> · Open source on <a href="https://github.com/agrwl-utkarsh/mini2" target="_blank" rel="noopener noreferrer">GitHub</a></p>
       </footer>
     </div>
   )
