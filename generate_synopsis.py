@@ -2,7 +2,7 @@ import os
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, HRFlowable
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
@@ -27,24 +27,29 @@ class NumberedCanvas(canvas.Canvas):
 
     def draw_page_decorations(self, page_count):
         self.saveState()
-        self.setFont("Times-Roman", 10)
-        self.setFillColor(colors.HexColor("#374151"))
+        self.setFont("Times-Roman", 9)
+        self.setFillColor(colors.HexColor("#4b5563"))
         
-        # Don't draw header/footer on title page
+        # Draw header on all pages except page 1
         if self._pageNumber > 1:
-            self.drawString(54, 745, "Project Synopsis — GitHub Repository Explainer")
+            self.drawString(54, 746, "Project Synopsis — GitHub Repository Explainer")
+            self.drawRightString(612 - 54, 746, "B.Tech Computer Science")
             self.setStrokeColor(colors.HexColor("#d1d5db"))
             self.setLineWidth(0.5)
-            self.line(54, 737, 612 - 54, 737)
+            self.line(54, 738, 612 - 54, 738)
             
-            # Simple bottom page numbering
-            self.line(54, 52, 612 - 54, 52)
-            self.drawRightString(612 - 54, 38, f"Page {self._pageNumber} of {page_count}")
-            self.drawString(54, 38, "B.Tech Computer Science & Engineering")
+        # Running footer on every page
+        self.setStrokeColor(colors.HexColor("#d1d5db"))
+        self.setLineWidth(0.5)
+        self.line(54, 46, 612 - 54, 46)
+        page_text = f"Page {self._pageNumber} of {page_count}"
+        self.drawRightString(612 - 54, 34, page_text)
+        self.drawString(54, 34, "Department of Computer Science & Engineering")
             
         self.restoreState()
 
 def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
+    # Margins: 0.75 in (54 pt)
     doc = SimpleDocTemplate(
         filename,
         pagesize=letter,
@@ -56,37 +61,26 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
 
     styles = getSampleStyleSheet()
 
-    title_style = ParagraphStyle(
-        'DocTitle',
+    toc_title_style = ParagraphStyle(
+        'TOCTitle',
         parent=styles['Normal'],
         fontName='Times-Bold',
         fontSize=20,
         leading=24,
-        alignment=TA_CENTER,
+        alignment=TA_LEFT,
         textColor=colors.HexColor("#111827"),
-        spaceAfter=10
-    )
-
-    sub_title_style = ParagraphStyle(
-        'DocSub',
-        parent=styles['Normal'],
-        fontName='Times-Roman',
-        fontSize=12,
-        leading=16,
-        alignment=TA_CENTER,
-        textColor=colors.HexColor("#4b5563"),
-        spaceAfter=16
+        spaceAfter=14
     )
 
     h1_style = ParagraphStyle(
         'SecHeading',
         parent=styles['Normal'],
         fontName='Times-Bold',
-        fontSize=13,
-        leading=17,
+        fontSize=12.5,
+        leading=16,
         textColor=colors.HexColor("#111827"),
-        spaceBefore=12,
-        spaceAfter=6,
+        spaceBefore=10,
+        spaceAfter=4,
         keepWithNext=True
     )
 
@@ -94,11 +88,11 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         'SubHeading',
         parent=styles['Normal'],
         fontName='Times-Bold',
-        fontSize=11,
-        leading=15,
+        fontSize=10.5,
+        leading=14,
         textColor=colors.HexColor("#1f2937"),
-        spaceBefore=8,
-        spaceAfter=4,
+        spaceBefore=6,
+        spaceAfter=3,
         keepWithNext=True
     )
 
@@ -106,27 +100,27 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         'StudentBody',
         parent=styles['Normal'],
         fontName='Times-Roman',
-        fontSize=10.5,
-        leading=15,
+        fontSize=9.8,
+        leading=13.8,
         alignment=TA_JUSTIFY,
         textColor=colors.HexColor("#1f2937"),
-        spaceAfter=8
+        spaceAfter=5
     )
 
     bullet_style = ParagraphStyle(
         'BulletStyle',
         parent=body_style,
-        leftIndent=16,
-        bulletIndent=6,
-        spaceAfter=4
+        leftIndent=14,
+        bulletIndent=2,
+        spaceAfter=3
     )
 
     toc_item_style = ParagraphStyle(
         'TOCItem',
         parent=styles['Normal'],
         fontName='Times-Bold',
-        fontSize=10.5,
-        leading=15,
+        fontSize=10,
+        leading=14,
         textColor=colors.HexColor("#111827")
     )
 
@@ -134,9 +128,9 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         'TOCSubItem',
         parent=styles['Normal'],
         fontName='Times-Roman',
-        fontSize=10,
-        leading=14,
-        leftIndent=18,
+        fontSize=9.5,
+        leading=13,
+        leftIndent=16,
         textColor=colors.HexColor("#374151")
     )
 
@@ -144,9 +138,9 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         'TOCSubSubItem',
         parent=styles['Normal'],
         fontName='Times-Roman',
-        fontSize=9.5,
-        leading=13,
-        leftIndent=34,
+        fontSize=9,
+        leading=12,
+        leftIndent=30,
         textColor=colors.HexColor("#4b5563")
     )
 
@@ -154,78 +148,77 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         'CodeStyle',
         parent=styles['Normal'],
         fontName='Courier',
-        fontSize=8.5,
-        leading=11.5,
+        fontSize=8,
+        leading=10.5,
         textColor=colors.HexColor("#1e293b")
     )
 
     story = []
 
     # =========================================================================
-    # PAGE 1: TITLE & TABLE OF CONTENTS
+    # START DIRECTLY WITH: TABLE OF CONTENTS (Exact layout from image)
     # =========================================================================
-    story.append(Spacer(1, 10))
-    story.append(Paragraph("PROJECT SYNOPSIS", ParagraphStyle('PreTitle', fontName='Times-Bold', fontSize=12, leading=14, alignment=TA_CENTER, textColor=colors.HexColor("#2563eb"))))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("GitHub Repository Explainer: A Web Tool to Explain Complex Code Repositories in Simple English", title_style))
-    story.append(Paragraph("A Minor Project for B.Tech Computer Science (2nd Year)", sub_title_style))
-    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#d1d5db"), spaceAfter=14))
+    story.append(Paragraph("Table of Contents", toc_title_style))
 
-    story.append(Paragraph("Table of Contents", h1_style))
-    story.append(Spacer(1, 4))
-
+    # Clean TOC matching the screenshot
     toc_data = [
-        [Paragraph("Abstract", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 2", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("1. Introduction", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 2", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("1.1 Background", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 2", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("1.2 Objectives", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 2", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("2. Literature Review", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 3", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("3. Methodology", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 3", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("3.1 Materials and Methods", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 3", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("3.2 Project Design", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 4", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("4. Implementation", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 4", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("4.1 Steps Taken", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 4", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("4.2 Tools and Technologies Used", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 4", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("5. Results and Discussion", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 5", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("6. Conclusion", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 5", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("6.1 Summary of Findings", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 5", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("6.2 Limitations", toc_sub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 5", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("7. References", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 6", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("8. Appendices", toc_item_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 6", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("• Appendix A: Project Code", toc_subsub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 6", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))],
-        [Paragraph("• Appendix B: Additional Data", toc_subsub_style), Paragraph("....................................................................................................................", ParagraphStyle('dots', fontName='Times-Roman', fontSize=9, textColor=colors.HexColor("#9ca3af"), alignment=TA_RIGHT)), Paragraph("Page 6", ParagraphStyle('pnum', fontName='Times-Roman', fontSize=9, alignment=TA_RIGHT))]
+        [Paragraph("Abstract", toc_item_style)],
+        [Spacer(1, 2)],
+        [Paragraph("1. Introduction", toc_item_style)],
+        [Paragraph("1.1 Background", toc_sub_style)],
+        [Paragraph("1.2 Objectives", toc_sub_style)],
+        [Spacer(1, 2)],
+        [Paragraph("2. Literature Review", toc_item_style)],
+        [Paragraph("3. Methodology", toc_item_style)],
+        [Paragraph("3.1 Materials and Methods", toc_sub_style)],
+        [Paragraph("3.2 Project Design", toc_sub_style)],
+        [Spacer(1, 2)],
+        [Paragraph("4. Implementation", toc_item_style)],
+        [Paragraph("4.1 Steps Taken", toc_sub_style)],
+        [Paragraph("4.2 Tools and Technologies Used", toc_sub_style)],
+        [Spacer(1, 2)],
+        [Paragraph("5. Results and Discussion", toc_item_style)],
+        [Paragraph("6. Conclusion", toc_item_style)],
+        [Paragraph("6.1 Summary of Findings", toc_sub_style)],
+        [Paragraph("6.2 Limitations", toc_sub_style)],
+        [Spacer(1, 2)],
+        [Paragraph("7. References", toc_item_style)],
+        [Paragraph("8. Appendices", toc_item_style)],
+        [Paragraph("o Appendix A: Project Code", toc_subsub_style)],
+        [Paragraph("o Appendix B: Additional Data", toc_subsub_style)]
     ]
 
-    toc_table = Table(toc_data, colWidths=[200, 240, 64])
+    toc_table = Table(toc_data, colWidths=[504])
     toc_table.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 1.5),
-        ('TOPPADDING', (0,0), (-1,-1), 1.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+        ('TOPPADDING', (0,0), (-1,-1), 1),
         ('LEFTPADDING', (0,0), (-1,-1), 0),
         ('RIGHTPADDING', (0,0), (-1,-1), 0),
     ]))
     story.append(toc_table)
-    story.append(PageBreak())
+    story.append(Spacer(1, 14))
+    story.append(HRFlowable(width="100%", thickness=0.75, color=colors.HexColor("#e5e7eb"), spaceAfter=10))
 
     # =========================================================================
-    # PAGE 2: ABSTRACT & 1. INTRODUCTION
+    # ABSTRACT (Flows naturally on Page 1 to eliminate blank space)
     # =========================================================================
     story.append(Paragraph("Abstract", h1_style))
     story.append(Paragraph(
         "When engineering students and junior developers start exploring open-source projects on GitHub, they often feel completely overwhelmed. Most project README files are written by experienced programmers who use very technical terms, skip basic explanations, and jump straight into long lists of installation commands. Beginners find it difficult to understand what the project actually does, how it works in real life, and why someone made it. "
-        "To solve this problem, we built <b>GitHub Repository Explainer</b>. It is a simple website where a user can paste any GitHub project link and click a button. In just a few seconds, our web app fetches the project documentation, sends it to an AI model with special teaching instructions, and shows a friendly, 5-paragraph explanation in plain English using simple real-world analogies. To make sure the site never crashes, we added an automatic backup system: if one AI service is busy or down, it automatically tries another one (like Grok, Gemini, DeepSeek, or OpenRouter). The website is built using React on the frontend and runs on Vercel without needing any database. In this synopsis, we explain the problem, our design, how we built the system, and what we learned.",
+        "To solve this problem, we built <b>GitHub Repository Explainer</b>. It is a clean, single-page web application where a user can paste any GitHub project link and click a button. In just a few seconds, our web app fetches the project documentation, sends it to an AI model with special teaching instructions, and shows a friendly, 5-paragraph explanation in plain English using simple real-world analogies. To make sure the site never crashes, we added an automatic backup system: if one AI service is busy or down, it automatically tries another one (like Grok, Gemini, DeepSeek, or OpenRouter). The website is built using React on the frontend and runs on Vercel without needing any database. In this synopsis, we explain the problem, our design, how we built the system, and what we learned.",
         body_style
     ))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
+    # =========================================================================
+    # 1. INTRODUCTION (1.1 Background, 1.2 Objectives)
+    # =========================================================================
     story.append(Paragraph("1. Introduction", h1_style))
     
     story.append(Paragraph("1.1 Background", h2_style))
     story.append(Paragraph(
-        "Open source is one of the best ways for college students to learn practical software development. GitHub has millions of public repositories, from small utility scripts to massive frameworks like React and Next.js. However, getting started is very difficult for 2nd or 3rd-year students. When we open a new repository, we see hundreds of files, complicated folder structures, and thousands of lines of code. We often do not know where the code starts running, what the main logic does, or which files we should read first.",
-        body_style
-    ))
-    story.append(Paragraph(
+        "Open source is one of the best ways for college students to learn practical software development. GitHub has millions of public repositories, from small utility scripts to massive frameworks like React and Next.js. However, getting started is very difficult for 2nd or 3rd-year students. When we open a new repository, we see hundreds of files, complicated folder structures, and thousands of lines of code. We often do not know where the code starts running, what the main logic does, or which files we should read first. "
         "Even when a repository has a README file, it is usually not written for beginners. It often looks like a boring manual with terminal commands like <code>npm install</code>, badges, license text, and acronyms that beginners have never heard of. Students hesitate to ask senior developers or teachers for help because they fear asking silly questions. As a result, many students give up and close the tab. This created a clear need for a simple tool that acts like a friendly senior student sitting next to you, explaining any project in simple words.",
         body_style
     ))
@@ -239,43 +232,32 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     story.append(Paragraph("• <b>Friendly Teaching Style:</b> Instruct the AI to write in normal paragraphs instead of boring bullet points, using real-life analogies (like comparing code to a shared whiteboard or LEGO blocks).", bullet_style))
     story.append(Paragraph("• <b>Reliable Backup System:</b> Connect multiple AI providers in a chain (Grok → Gemini → DeepSeek → OpenRouter → Hugging Face) so if one fails or runs out of free quota, the next one answers automatically.", bullet_style))
     story.append(Paragraph("• <b>Fast and Free to Host:</b> Build a lightweight website using React and Vite that runs for free on Vercel with zero database setup.", bullet_style))
-    story.append(Paragraph("• <b>Foundation for Extra Tools:</b> Create a tabbed user interface so we can later add visual architecture flowcharts, a Q&A chatbot, and a code viewer.", bullet_style))
-    story.append(PageBreak())
+    story.append(Paragraph("• <b>Foundation for Extra Tools:</b> Create a tabbed user interface so we can later add visual architecture flowcharts, a Q&A chatbot, and an in-browser code viewer.", bullet_style))
+    story.append(Spacer(1, 6))
 
     # =========================================================================
-    # PAGE 3: 2. LITERATURE REVIEW & 3. METHODOLOGY
+    # 2. LITERATURE REVIEW
     # =========================================================================
     story.append(Paragraph("2. Literature Review", h1_style))
     story.append(Paragraph(
-        "Before building our project, we read research papers and articles about how developers learn and why software documentation is hard to understand. Studies by Robillard (2009) and Forward & Lethbridge (2002) found that bad or hard-to-read documentation is the biggest reason developers struggle to use software libraries. Tools like Javadoc or Doxygen can automatically list function names, but they only list technical details and do not explain the big picture or the reason why the code was written.",
-        body_style
-    ))
-    story.append(Paragraph(
+        "Before building our project, we read research papers and articles about how developers learn and why software documentation is hard to understand. Studies by Robillard (2009) and Forward & Lethbridge (2002) found that bad or hard-to-read documentation is the biggest reason developers struggle to use software libraries. Tools like Javadoc or Doxygen can automatically list function names, but they only list technical details and do not explain the big picture or the reason why the code was written. "
         "In recent years, Large Language Models (LLMs) like GPT, Gemini, and LLaMA have shown that AI can read and summarize text very well. However, recent studies (Hou et al., 2023) show that when people simply ask an AI to 'summarize this README', the AI usually copies the exact same technical words and makes a dry bullet-point list. That does not actually help a beginner. Moreover, web apps that depend on only one AI company often stop working when that company's servers are busy or when free rate limits are reached. Our project builds on these ideas by using a carefully designed prompt to enforce friendly teaching and by combining multiple AI providers together for reliability.",
         body_style
     ))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
+    # =========================================================================
+    # 3. METHODOLOGY (3.1 Materials and Methods, 3.2 Project Design)
+    # =========================================================================
     story.append(Paragraph("3. Methodology", h1_style))
 
     story.append(Paragraph("3.1 Materials and Methods", h2_style))
     story.append(Paragraph(
-        "Our method is divided into two main parts: getting the project files and generating the explanation.",
+        "Our method is divided into two main parts: getting the project files and generating the explanation. "
+        "First, when the user gives a GitHub link (for example, <code>github.com/facebook/react</code>), our backend server extracts the owner (<code>facebook</code>) and repository name (<code>react</code>). Instead of using GitHub's official API, which has a strict rate limit of 60 requests per hour for guest users, our server fetches the raw markdown file directly from GitHub's public file server (<code>raw.githubusercontent.com</code>). We check common branches (<code>main</code>, <code>master</code>) and file names (<code>README.md</code>, <code>README.txt</code>). "
+        "Second, we wrote a prompt that tells the AI to act like a senior engineer mentoring a junior student during a 1-on-1 walkthrough. We explicitly set clear rules: (1) Do NOT copy or quote sentences directly from the README; (2) Do NOT use bullet points or lists, but write in 5 to 6 flowing, natural paragraphs; (3) Start with the problem: Why did someone create this project?; (4) Use everyday analogies ('Think of it like a shared whiteboard...'); and (5) Explain any difficult technical word the moment it appears.",
         body_style
     ))
-    story.append(Paragraph(
-        "<b>1. Fetching the Documentation:</b> When the user gives a GitHub link (for example, <code>github.com/facebook/react</code>), our backend server extracts the owner (<code>facebook</code>) and repository name (<code>react</code>). Instead of using GitHub's official API, which has a strict rate limit of 60 requests per hour for guest users, our server fetches the raw markdown file directly from GitHub's public file server (<code>raw.githubusercontent.com</code>). We check common branches (<code>main</code>, <code>master</code>) and file names (<code>README.md</code>, <code>README.txt</code>).",
-        body_style
-    ))
-    story.append(Paragraph(
-        "<b>2. Prompt Engineering:</b> The prompt is the instruction given to the AI. We wrote a prompt that tells the AI to act like a senior engineer mentoring a junior student during a 1-on-1 walkthrough. We explicitly set clear rules:",
-        body_style
-    ))
-    story.append(Paragraph("• Do NOT copy or quote sentences directly from the README.", bullet_style))
-    story.append(Paragraph("• Do NOT use bullet points or lists; write in 5 to 6 flowing, natural paragraphs.", bullet_style))
-    story.append(Paragraph("• Start with the problem: Why did someone create this project?", bullet_style))
-    story.append(Paragraph("• Use everyday analogies ('Think of it like a shared whiteboard...').", bullet_style))
-    story.append(Paragraph("• Explain any difficult technical word the moment it appears.", bullet_style))
 
     story.append(Paragraph("3.2 Project Design", h2_style))
     story.append(Paragraph(
@@ -284,35 +266,31 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     ))
 
     flow_data = [
-        [Paragraph("Step", ParagraphStyle('f_h', fontName='Times-Bold', fontSize=9.5, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("What Happens", ParagraphStyle('f_h', fontName='Times-Bold', fontSize=9.5, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("Description", ParagraphStyle('f_h', fontName='Times-Bold', fontSize=9.5, textColor=colors.HexColor("#1e3a8a")))],
+        [Paragraph("Step", ParagraphStyle('f_h', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("What Happens", ParagraphStyle('f_h', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("Description", ParagraphStyle('f_h', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a")))],
         [Paragraph("1. User Input", code_style), Paragraph("React Website", body_style), Paragraph("User pastes a GitHub URL or clicks one of our quick examples (Next.js, React, Vite, Tailwind).", body_style)],
         [Paragraph("2. Server Check", code_style), Paragraph("Vercel Serverless Function", body_style), Paragraph("Our backend takes the URL, cleans it, and fetches the README text from GitHub within seconds.", body_style)],
         [Paragraph("3. AI Hand-off", code_style), Paragraph("5-Tier Fallback Chain", body_style), Paragraph("Sends the README and prompt to the active AI provider. If one fails, it tries the next one in line.", body_style)],
         [Paragraph("4. Display", code_style), Paragraph("Tabbed Result Screen", body_style), Paragraph("Shows the final plain-English breakdown with tabs for code explanation, flow diagrams, and chatbot.", body_style)]
     ]
-    flow_table = Table(flow_data, colWidths=[80, 140, 284])
+    flow_table = Table(flow_data, colWidths=[76, 134, 294])
     flow_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#dbeafe")),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#93c5fd")),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(flow_table)
-    story.append(PageBreak())
+    story.append(Spacer(1, 6))
 
     # =========================================================================
-    # PAGE 4: 4. IMPLEMENTATION
+    # 4. IMPLEMENTATION (4.1 Steps Taken, 4.2 Tools and Technologies Used)
     # =========================================================================
     story.append(Paragraph("4. Implementation", h1_style))
 
     story.append(Paragraph("4.1 Steps Taken", h2_style))
-    story.append(Paragraph(
-        "We built the project step by step over several stages:",
-        body_style
-    ))
     story.append(Paragraph("<b>Step 1: Setting up the Frontend with React & Vite:</b> We used Vite to create a fast React application. We designed a clean, white user interface with a search input box, clear buttons, example buttons, and a tab bar so the user can switch views easily.", bullet_style))
     story.append(Paragraph("<b>Step 2: Creating the Backend API Function:</b> We wrote a serverless JavaScript function in <code>api/analyze.js</code>. This function runs on Vercel. It receives the repository link, splits the link to find the owner and repo name, and downloads the raw README file using native <code>fetch()</code>.", bullet_style))
     story.append(Paragraph("<b>Step 3: Building the Multi-AI Fallback Logic:</b> AI APIs can sometimes be unreliable (for example, free keys hit rate limits or return 429 errors). We wrote fallback functions for 5 providers: Grok, Gemini, DeepSeek, OpenRouter, and Hugging Face. The code tries them in order using a simple <code>try / catch</code> block.", bullet_style))
@@ -326,9 +304,9 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     ))
 
     tools_data = [
-        [Paragraph("Tool / Tech", ParagraphStyle('th_h', fontName='Times-Bold', fontSize=9.5, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("What It Does", ParagraphStyle('th_h', fontName='Times-Bold', fontSize=9.5, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("Why We Used It", ParagraphStyle('th_h', fontName='Times-Bold', fontSize=9.5, textColor=colors.HexColor("#1e3a8a")))],
+        [Paragraph("Tool / Tech", ParagraphStyle('th_h', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("What It Does", ParagraphStyle('th_h', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("Why We Used It", ParagraphStyle('th_h', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a")))],
         [Paragraph("React 18", code_style), Paragraph("Frontend library for building the UI", body_style), Paragraph("Makes it easy to manage state (like loading spinners, errors, and tabs) without refreshing the page.", body_style)],
         [Paragraph("Vite 5", code_style), Paragraph("Fast build tool and dev server", body_style), Paragraph("Starts in less than a second and creates a very small bundle (under 60 KB) for the browser.", body_style)],
         [Paragraph("Node.js 20", code_style), Paragraph("Backend runtime on Vercel", body_style), Paragraph("Runs serverless functions that keep our AI API keys secret from public users.", body_style)],
@@ -336,19 +314,19 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         [Paragraph("AI APIs", code_style), Paragraph("Grok, Gemini, DeepSeek, OpenRouter", body_style), Paragraph("Provides the smart language models that read the documentation and write the plain English explanation.", body_style)],
         [Paragraph("Plain CSS", code_style), Paragraph("Clean custom styling", body_style), Paragraph("Kept the design clean and white with blue accents without needing heavy CSS frameworks.", body_style)]
     ]
-    tools_table = Table(tools_data, colWidths=[90, 150, 264])
+    tools_table = Table(tools_data, colWidths=[80, 140, 284])
     tools_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#f1f5f9")),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#cbd5e1")),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(tools_table)
-    story.append(PageBreak())
+    story.append(Spacer(1, 6))
 
     # =========================================================================
-    # PAGE 5: 5. RESULTS & 6. CONCLUSION
+    # 5. RESULTS AND DISCUSSION
     # =========================================================================
     story.append(Paragraph("5. Results and Discussion", h1_style))
     story.append(Paragraph(
@@ -367,8 +345,11 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         "<b>3. Speed and Performance:</b> Getting an explanation takes around 1.5 to 2.5 seconds depending on the AI model. Because our web page is very small (under 60 KB), the website opens instantly on phones as well as laptops.",
         body_style
     ))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
+    # =========================================================================
+    # 6. CONCLUSION (6.1 Summary of Findings, 6.2 Limitations)
+    # =========================================================================
     story.append(Paragraph("6. Conclusion", h1_style))
 
     story.append(Paragraph("6.1 Summary of Findings", h2_style))
@@ -378,18 +359,14 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     ))
 
     story.append(Paragraph("6.2 Limitations", h2_style))
-    story.append(Paragraph(
-        "As second-year students, we also identified a few limitations in our project that can be improved in future semesters:",
-        body_style
-    ))
     story.append(Paragraph("• <b>Depends on the README:</b> If a repository does not have a README file or has only two sentences, our tool cannot explain much because it relies on documentation.", bullet_style))
     story.append(Paragraph("• <b>Truncation on Long Documents:</b> Very long README files are cut at 8,000 characters so we do not exceed token limits or spend too much compute time.", bullet_style))
     story.append(Paragraph("• <b>Public Repositories Only:</b> Currently, the tool only works on public GitHub links. It cannot access private company repositories because that requires OAuth login tokens.", bullet_style))
     story.append(Paragraph("• <b>Non-English Projects:</b> While models can translate, repositories written in other languages sometimes produce less accurate explanations.", bullet_style))
-    story.append(PageBreak())
+    story.append(Spacer(1, 6))
 
     # =========================================================================
-    # PAGE 6: 7. REFERENCES & 8. APPENDICES
+    # 7. REFERENCES
     # =========================================================================
     story.append(Paragraph("7. References", h1_style))
     
@@ -402,9 +379,12 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         "[6] Vercel Documentation, 'Serverless Functions Overview,' [Online]. Available: https://vercel.com/docs/functions."
     ]
     for ref in refs:
-        story.append(Paragraph(ref, ParagraphStyle('RefStyle', parent=body_style, leftIndent=18, firstLineIndent=-18, fontSize=9.5, leading=14, spaceAfter=4)))
-    story.append(Spacer(1, 10))
+        story.append(Paragraph(ref, ParagraphStyle('RefStyle', parent=body_style, leftIndent=16, firstLineIndent=-16, fontSize=9, leading=13, spaceAfter=3)))
+    story.append(Spacer(1, 6))
 
+    # =========================================================================
+    # 8. APPENDICES
+    # =========================================================================
     story.append(Paragraph("8. Appendices", h1_style))
 
     story.append(Paragraph("Appendix A: Project Code", h2_style))
@@ -418,7 +398,6 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
         "export default async function handler(req, res) {\n"
         "  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });\n"
         "  const { url } = req.body;\n"
-        "  // Extract owner and repo from URL\n"
         "  const parts = url.replace(/\\/$/, '').split('/');\n"
         "  const owner = parts[parts.length - 2];\n"
         "  const repo = parts[parts.length - 1];\n\n"
@@ -435,44 +414,44 @@ def build_pdf(filename="Project_Synopsis_GitHub_Repo_Explainer.pdf"):
     code_table = Table([[Paragraph(code_text.replace("\n", "<br/>").replace(" ", "&nbsp;"), code_style)]], colWidths=[504])
     code_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#f8fafc")),
-        ('BOX', (0,0), (-1,-1), 1, colors.HexColor("#cbd5e1")),
-        ('LEFTPADDING', (0,0), (-1,-1), 10),
-        ('RIGHTPADDING', (0,0), (-1,-1), 10),
-        ('TOPPADDING', (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('BOX', (0,0), (-1,-1), 0.75, colors.HexColor("#cbd5e1")),
+        ('LEFTPADDING', (0,0), (-1,-1), 8),
+        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
     story.append(code_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
     story.append(Paragraph("Appendix B: Additional Data", h2_style))
     story.append(Paragraph(
         "<b>Table B.1: Testing Different AI Providers During Our Project</b>",
-        ParagraphStyle('TableCap', fontName='Times-Bold', fontSize=9.5, leading=13, spaceAfter=4)
+        ParagraphStyle('TableCap', fontName='Times-Bold', fontSize=9, leading=12, spaceAfter=3)
     ))
     
     bench_data = [
-        [Paragraph("Provider", ParagraphStyle('bh', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("Model Used", ParagraphStyle('bh', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("Avg. Speed", ParagraphStyle('bh', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a"))),
-         Paragraph("Our Experience / Notes", ParagraphStyle('bh', fontName='Times-Bold', fontSize=9, textColor=colors.HexColor("#1e3a8a")))],
+        [Paragraph("Provider", ParagraphStyle('bh', fontName='Times-Bold', fontSize=8.5, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("Model Used", ParagraphStyle('bh', fontName='Times-Bold', fontSize=8.5, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("Avg. Speed", ParagraphStyle('bh', fontName='Times-Bold', fontSize=8.5, textColor=colors.HexColor("#1e3a8a"))),
+         Paragraph("Our Experience / Notes", ParagraphStyle('bh', fontName='Times-Bold', fontSize=8.5, textColor=colors.HexColor("#1e3a8a")))],
         [Paragraph("1. xAI Grok", code_style), Paragraph("grok-beta", body_style), Paragraph("~1.4 sec", body_style), Paragraph("Very conversational and friendly tone. Primary choice.", body_style)],
         [Paragraph("2. Google Gemini", code_style), Paragraph("gemini-1.5-flash", body_style), Paragraph("~1.2 sec", body_style), Paragraph("Very fast, has a generous free tier for students.", body_style)],
         [Paragraph("3. DeepSeek", code_style), Paragraph("deepseek-chat", body_style), Paragraph("~1.8 sec", body_style), Paragraph("Gives strong logical explanations, low API cost.", body_style)],
         [Paragraph("4. OpenRouter", code_style), Paragraph("Llama 3.2 / Gemma 2", body_style), Paragraph("~2.2 sec", body_style), Paragraph("Great because it has completely free open models.", body_style)],
         [Paragraph("5. Raw Fallback", code_style), Paragraph("Sanitized Text", body_style), Paragraph("0.1 sec", body_style), Paragraph("Shows original README text if all AI keys fail.", body_style)]
     ]
-    bench_table = Table(bench_data, colWidths=[90, 115, 75, 224])
+    bench_table = Table(bench_data, colWidths=[80, 110, 70, 244])
     bench_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#dbeafe")),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#93c5fd")),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING', (0,0), (-1,-1), 3),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('TOPPADDING', (0,0), (-1,-1), 2.5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2.5),
     ]))
     story.append(bench_table)
 
     doc.build(story, canvasmaker=NumberedCanvas)
-    print(f"Realistic student synopsis PDF generated at {filename}")
+    print(f"Optimized continuous synopsis PDF generated at {filename}")
 
 if __name__ == '__main__':
     build_pdf()
