@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Repository Explainer — 5-Slide Foundation Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-white: #ffffff;
+      --bg-canvas: #f8fafc;
+      --card-bg: #f8fafc;
+      --card-blue: #eff6ff;
+      --border: #e2e8f0;
+      --border-blue: #bfdbfe;
+      --text-main: #0f172a;
+      --text-muted: #334155;
+      --text-soft: #64748b;
+      --blue-primary: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-badge: #dbeafe;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 36px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck-container {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .deck-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 4px;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .badge-live .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue-primary);
+    }
+
+    .key-hint {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .slide-viewport {
+      position: relative;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+      aspect-ratio: 16 / 9.6;
+      min-height: 590px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 44px 56px 36px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      transition: opacity 0.15s ease-in-out;
+      background: var(--bg-white);
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .slide-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue-primary);
+    }
+
+    .slide-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .slide-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      font-weight: 400;
+      max-width: 920px;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      margin: 18px 0 10px;
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card.blue {
+      background: var(--card-blue);
+      border-color: var(--border-blue);
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--blue-primary);
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+    }
+
+    .grid-split-img-left {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      width: 100%;
+      align-items: center;
+    }
+
+    .slide-img-box {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide-img-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .deck-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 4px;
+    }
+
+    .indicators {
+      display: flex;
+      gap: 6px;
+    }
+
+    .indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .indicator-dot.active {
+      background: var(--blue-primary);
+      width: 26px;
+      border-radius: 10px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-primary {
+      background: var(--blue-primary);
+      color: #ffffff;
+      border-color: var(--blue-primary);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--blue-hover);
+      border-color: var(--blue-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    ul.clean-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    ul.clean-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    ul.clean-list li .bullet {
+      color: var(--blue-primary);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+    <header class="deck-topbar">
+      <div class="badge-live">
+        <span class="dot"></span>
+        <span style="font-weight: 600;">GitHub Repository Explainer</span>
+        <span style="color: var(--border);">/</span>
+        <span>5-Slide Foundation Preview</span>
+      </div>
+      <div class="deck-nav-hints">
+        <span>Use: <span class="key-hint">←</span> <span class="key-hint">→</span> or <span class="key-hint">Space</span></span>
+        <span style="color: var(--border);">|</span>
+        <button id="fullscreen-btn" class="btn" style="padding: 3px 8px; font-size: 11px;">Full Screen</button>
+      </div>
+    </header>
+
+    <main class="slide-viewport" id="viewport">
+
+      <!-- ============================================== -->
+      <!-- SLIDE 1: INTRODUCTION                          -->
+      <!-- ============================================== -->
+      <section class="slide active" data-slide="1">
+        <div class="slide-header">
+          <div class="slide-tag">Slide 01 · Welcome & Overview</div>
+          <h1 class="slide-title" style="font-size: 38px; margin-top: 6px;">GitHub Repository Explainer</h1>
+          <p class="slide-subtitle" style="font-size: 16px; margin-top: 6px;">
+            A friendly, everyday guide that turns complex open-source software projects into clear, conversational English anyone can understand.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3" style="width: 100%;">
+            <div class="card blue">
+              <div class="card-label">The Core Mission</div>
+              <div class="card-title">Making Code Approachable</div>
+              <p class="card-desc">Think of it like having an experienced, patient friend sitting right beside you, explaining what a codebase does without intimidating words.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-label">Frictionless Experience</div>
+              <div class="card-title">Just Paste a Link</div>
+              <p class="card-desc">No accounts to create, no software to install, and no environment setup. Just paste any GitHub repository link and click one button.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-label">Built to Last</div>
+              <div class="card-title">Always Fast & Reliable</div>
+              <p class="card-desc">Powered by multiple smart helpers behind the scenes. If one helper is busy or down, another steps in instantly so you never see an error.</p>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <div>Introductory Slide · Welcome & Project Overview</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 01 of 05</div>
+        </footer>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SLIDE 2: THE PROBLEM (Day-One Onboarding Shock) -->
+      <!-- ============================================== -->
+      <section class="slide" data-slide="2">
+        <div class="slide-header">
+          <div class="slide-tag">Slide 02 · The Problem</div>
+          <h2 class="slide-title">The Day-One Shock: Walking Into a Massive Codebase Blind</h2>
+          <p class="slide-subtitle">
+            When junior engineers and beginners get into open source or join a new company, they are suddenly handed thousands of lines of unfamiliar logic with no guided tour.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-split-img-left">
+            <div class="slide-img-box">
+              <img src="assets/slide2_problem.png" alt="Day-One Reality vs The Onboarding Barrier">
+            </div>
+
+            <div class="card blue" style="height: 100%; justify-content: center;">
+              <div class="card-label">The Beginner's Dilemma</div>
+              <div class="card-title">Lost in Nested Files & Logic</div>
+              <ul class="clean-list" style="margin-top: 10px;">
+                <li><span class="bullet">•</span> <strong>Overwhelming volume:</strong> Handed 50,000+ lines of code across hundreds of files on day one.</li>
+                <li><span class="bullet">•</span> <strong>No starting map:</strong> You don't know which files matter, where logic begins, or why decisions were made.</li>
+                <li><span class="bullet">•</span> <strong>Hesitation to bother seniors:</strong> Beginners fear asking "stupid" questions every ten minutes.</li>
+                <li><span class="bullet">•</span> <strong>The Result:</strong> Days turn into weeks of staring at screens instead of building confidence.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <div>Explanation 1 of 8 · The Problem: Onboarding Friction for Junior Engineers</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 02 of 05</div>
+        </footer>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SLIDE 3: THE SOLUTION (On-Demand Senior Mentor) -->
+      <!-- ============================================== -->
+      <section class="slide" data-slide="3">
+        <div class="slide-header">
+          <div class="slide-tag">Slide 03 · The Solution</div>
+          <h2 class="slide-title">The Solution: An On-Demand Senior Mentor in Your Browser</h2>
+          <p class="slide-subtitle">
+            Instead of suffering in silence or digging through dense files, junior developers get a patient companion whose only job is to explain any project clearly.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/slide3_solution.png" alt="3 Simple Steps: Link, Mentor Walkthrough, Confident Beginner">
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <div>Explanation 2 of 8 · The Solution: Zero-Friction 3-Step Walkthrough</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 03 of 05</div>
+        </footer>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SLIDE 4: THE CONCEPT (Everyday Analogies & Why)  -->
+      <!-- ============================================== -->
+      <section class="slide" data-slide="4">
+        <div class="slide-header">
+          <div class="slide-tag">Slide 04 · The Concept</div>
+          <h2 class="slide-title">The Concept: How It Translates Code into Human Concepts</h2>
+          <p class="slide-subtitle">
+            Rather than spitting out code line-by-line, the explainer focuses on human mental models, everyday analogies, and the "why" behind the software.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/slide4_concept.png" alt="Concept: The Why First, Everyday Analogies, Instant Jargon Relief, Gentle First Steps">
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <div>Explanation 3 of 8 · The Concept: Conceptual Translation vs Jargon Dumps</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 04 of 05</div>
+        </footer>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SLIDE 5: THE EXPERIENCE (60-Second Transformation) -->
+      <!-- ============================================== -->
+      <section class="slide" data-slide="5">
+        <div class="slide-header">
+          <div class="slide-tag">Slide 05 · The Experience</div>
+          <h2 class="slide-title">The Experience: From Total Confusion to Confident in 60 Seconds</h2>
+          <p class="slide-subtitle">
+            What the user actually sees: a cohesive, 5-paragraph narrative walkthrough that leaves them ready to contribute and discuss with their team.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/slide5_experience.png" alt="Live Interface Experience showing URL input and 5-paragraph mentor explanation">
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <div>Explanation 4 of 8 · The Experience: The 60-Second Transformation</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 05 of 05</div>
+        </footer>
+      </section>
+
+    </main>
+
+    <footer class="deck-controls">
+      <div class="btn-group">
+        <button id="prev-btn" class="btn" aria-label="Previous Slide">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13L5 8l5-5"/></svg>
+          Previous
+        </button>
+        <button id="next-btn" class="btn btn-primary" aria-label="Next Slide">
+          Next
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
+        </button>
+      </div>
+
+      <div class="indicators" id="indicators">
+        <!-- 5 dots generated by JS -->
+      </div>
+
+      <div class="btn-group">
+        <a href="presentation.pptx" download="GitHub-Repository-Explainer-5Slides.pptx" class="btn btn-primary" style="text-decoration: none;" title="Download PowerPoint presentation">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9M4 8l4 4 4-4M2 14h12"/></svg>
+          Download .PPTX
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const indicatorsContainer = document.getElementById('indicators');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    let currentIndex = 0;
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = `indicator-dot ${i === 0 ? 'active' : ''}`;
+      dot.setAttribute('title', `Slide ${i + 1}`);
+      dot.addEventListener('click', () => goToSlide(i));
+      indicatorsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.indicator-dot');
+
+    function updateSlide() {
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentIndex));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === slides.length - 1;
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < slides.length) {
+        currentIndex = index;
+        updateSlide();
+      }
+    }
+
+    prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        goToSlide(currentIndex + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        goToSlide(currentIndex - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(slides.length - 1);
+      }
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      const elem = document.getElementById('viewport');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => console.warn(err));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>
