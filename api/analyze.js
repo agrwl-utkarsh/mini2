@@ -49,16 +49,33 @@ async function fetchReadme(owner, repo) {
 }
 
 async function explainReadme(readme) {
-  const prompt = `Explain this GitHub repository's README in simple language for a beginner software engineer.
-Focus on:
-1. What this project does (in plain English)
-2. Key features
-3. How to use/install it (if mentioned)
-4. Any important concepts a beginner should know
+  const prompt = `You are a senior software engineer teaching a complete beginner. Explain this GitHub repository in a way that someone with basic coding knowledge can understand.
 
-Keep it clear, friendly, and educational. Use simple language.
+Write a comprehensive explanation in PARAGRAPHS (not bullet points). Do NOT copy or summarize the README directly. Instead, explain the concepts in your own words as if you're teaching someone.
 
-README:
+Cover these topics thoroughly:
+
+1. **What this project actually does** - Explain the problem it solves in plain English. Use analogies if helpful. What would a user see/experience?
+
+2. **How it works (high-level)** - Explain the core idea/architecture simply. What are the main components? How do they talk to each other?
+
+3. **Key features** - What can it do? Why would someone use it? Explain each major feature in simple terms.
+
+4. **How to use/install it** - If the README mentions installation, explain the steps in beginner-friendly language. What prerequisites are needed?
+
+5. **Important concepts a beginner should know** - Are there technical terms, patterns, or technologies mentioned (like "React", "API", "Docker", "CI/CD", "WebSocket", etc.)? Explain each one simply.
+
+6. **Why this project matters** - What's the real-world use case? Who would benefit from it?
+
+Writing style:
+- Use complete sentences and paragraphs
+- Friendly, conversational tone
+- Define technical terms when first used
+- Avoid jargon where possible; if needed, explain it
+- Imagine you're explaining to a junior developer over coffee
+- Minimum 4-5 substantial paragraphs
+
+README to explain:
 ${readme}`
 
   // 1. Try Gemini (correct model names for v1beta)
