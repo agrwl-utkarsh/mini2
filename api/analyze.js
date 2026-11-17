@@ -144,16 +144,25 @@ ${truncatedReadme}`
     }
   }
 
-  // 4. Try OpenRouter (current free models as of 2025)
+  // 4. Try OpenRouter (many models - free + cheap)
   const openRouterKey = process.env.OPENROUTER_API_KEY
   if (openRouterKey) {
     const openRouterModels = [
-      'meta-llama/llama-3.1-8b-instruct:free',
-      'mistralai/mistral-7b-instruct:free',
-      'google/gemma-2-9b-it:free',
-      'meta-llama/llama-3.1-70b-instruct:free',
-      'microsoft/phi-3-mini-128k-instruct:free',
-      'qwen/qwen-2-7b-instruct:free',
+      // Current free models (check openrouter.ai/models for latest)
+      'meta-llama/llama-3.2-3b-instruct:free',
+      'google/gemma-2-2b-it:free',
+      'qwen/qwen-2.5-1.5b-instruct:free',
+      'meta-llama/llama-3.2-1b-instruct:free',
+      // Very cheap models (often < $0.10/1M tokens)
+      'meta-llama/llama-3.1-8b-instruct',
+      'mistralai/mistral-7b-instruct',
+      'google/gemma-2-9b-it',
+      'meta-llama/llama-3.1-70b-instruct',
+      'microsoft/phi-3-mini-128k-instruct',
+      'qwen/qwen-2.5-7b-instruct',
+      'huggingfaceh4/zephyr-7b-beta',
+      'openchat/openchat-7b',
+      'nousresearch/nous-hermes-2-mistral-7b-dpo',
     ]
     for (const model of openRouterModels) {
       try {
