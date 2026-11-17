@@ -2,10 +2,10 @@ import { useState } from 'react'
 import './App.css'
 
 const TABS = [
-  { id: 'explanation', label: 'AI Explanation', icon: '🧠' },
-  { id: 'architecture', label: 'Architecture Flow', icon: '📊' },
-  { id: 'chatbot', label: 'AI Chatbot Q&A', icon: '💬' },
-  { id: 'explorer', label: 'Code Explorer', icon: '🔍' },
+  { id: 'explanation', label: 'Code Explanation' },
+  { id: 'architecture', label: 'Architecture Flow' },
+  { id: 'chatbot', label: 'AI Chatbot Q&A' },
+  { id: 'explorer', label: 'Code Explorer' },
 ]
 
 const PLACEHOLDERS = {
@@ -150,7 +150,6 @@ function App() {
                   className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                 >
-                  <span className="tab-icon">{tab.icon}</span>
                   <span className="tab-label">{tab.label}</span>
                 </button>
               ))}
