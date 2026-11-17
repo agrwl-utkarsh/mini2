@@ -33,6 +33,7 @@ export function useAnalyzeRepo() {
 }
 
 export function useRepoStatus(repoId: string | null, enabled = true) {
+  const queryClient = useQueryClient()
   const { updateRepoStatus } = useRepo()
 
   const query = useQuery({
@@ -41,7 +42,7 @@ export function useRepoStatus(repoId: string | null, enabled = true) {
     enabled: !!repoId && enabled,
     refetchInterval: (q) => {
       const data = q.state.data
-      return data?.status === 'complete' || data?.status === 'error' ? false : 2000
+      return data?.status === 'complete' || data?.status === 'error' ? false : 1000
     },
     gcTime: 0,
   })
@@ -49,19 +50,25 @@ export function useRepoStatus(repoId: string | null, enabled = true) {
   useEffect(() => {
     if (query.data) {
       updateRepoStatus(query.data.status, query.data.error)
+      if (query.data.status === 'complete') {
+        queryClient.invalidateQueries({ queryKey: ['repoStats', repoId] })
+        queryClient.invalidateQueries({ queryKey: ['repoStructure', repoId] })
+      }
     }
-  }, [query.data, updateRepoStatus])
+  }, [query.data, updateRepoStatus, repoId, queryClient])
 
   return query
 }
 
-export function useRepoStats(repoId: string | null) {
+export function useRepoStats(repoId: string | null, enabled = true) {
   const { setRepoStats } = useRepo()
 
   const query = useQuery({
     queryKey: ['repoStats', repoId],
     queryFn: () => api.getStats(repoId!),
-    enabled: !!repoId,
+    enabled: !!repoId && enabled,
+    retry: 3,
+    retryDelay: 1000,
     gcTime: 0,
   })
 
@@ -74,13 +81,15 @@ export function useRepoStats(repoId: string | null) {
   return query
 }
 
-export function useRepoStructure(repoId: string | null) {
+export function useRepoStructure(repoId: string | null, enabled = true) {
   const { setRepoTree } = useRepo()
 
   const query = useQuery({
     queryKey: ['repoStructure', repoId],
     queryFn: () => api.getStructure(repoId!),
-    enabled: !!repoId,
+    enabled: !!repoId && enabled,
+    retry: 3,
+    retryDelay: 1000,
     gcTime: 0,
   })
 

@@ -43,9 +43,10 @@ export function AnalysisPage() {
   const [isResizingContent, setIsResizingContent] = useState(false)
 
   // API hooks
-  useRepoStatus(repoId)
-  useRepoStats(repoId)
-  const structureQuery = useRepoStructure(repoId)
+  const statusQuery = useRepoStatus(repoId)
+  const isComplete = repo?.status === 'complete' || statusQuery.data?.status === 'complete'
+  const statsQuery = useRepoStats(repoId, isComplete)
+  const structureQuery = useRepoStructure(repoId, isComplete)
   const fileContentQuery = useFileContent(repoId, selectedFilePath)
   const explainMutation = useExplainFile(repoId)
   useChat(repoId)
@@ -162,7 +163,7 @@ export function AnalysisPage() {
     )
   }
 
-  const isLoading = repo.status !== 'complete'
+  const isLoading = repo.status !== 'complete' && !isComplete
   const isDashboard = activePanel === 'dashboard'
   const showExplorer = !isDashboard && (activePanel === 'explorer' || activePanel === 'explainer' || !!selectedFile)
   const showContent = !isDashboard && (selectedFile || activePanel === 'explorer' || activePanel === 'explainer')
@@ -288,7 +289,7 @@ export function AnalysisPage() {
         <div className="flex-1 flex overflow-hidden relative">
           {isDashboard ? (
             <div className="flex-1 overflow-auto p-6">
-              <Dashboard repo={repo} isLoading={isLoading} />
+              <Dashboard repo={{ ...repo, stats: repo.stats || statsQuery.data }} isLoading={isLoading} />
             </div>
           ) : (
             <>
