@@ -6,18 +6,12 @@ const TABS = [
   { id: 'architecture', label: 'Architecture Flow', icon: '📊' },
   { id: 'chatbot', label: 'AI Chatbot Q&A', icon: '💬' },
   { id: 'explorer', label: 'Code Explorer', icon: '🔍' },
-  { id: 'filetree', label: 'File Tree', icon: '📁' },
-  { id: 'depgraph', label: 'Dependency Graph', icon: '⚡' },
-  { id: 'coverage', label: 'Test Coverage', icon: '🧪' },
 ]
 
 const PLACEHOLDERS = {
   architecture: 'Architecture flow diagram will be generated here. This will show the high-level system architecture, data flow, and component interactions.',
   chatbot: 'AI Chatbot Q&A interface will appear here. You\'ll be able to ask questions about the repository and get contextual answers.',
   explorer: 'Code Explorer will appear here. Browse files, view code with syntax highlighting, and get AI explanations for specific functions or classes.',
-  filetree: 'File Tree Visualization will appear here. Interactive repository structure with folder/file navigation and quick stats.',
-  depgraph: 'Dependency Graph will appear here. Visual representation of package dependencies, import relationships, and module coupling.',
-  coverage: 'Test Coverage Insights will appear here. Coverage reports, uncovered lines, and test quality metrics.',
 }
 
 function App() {
