@@ -7,7 +7,11 @@ import { useChat } from '../../hooks/useRepo'
 import { useRepo } from '../../context/RepoContext'
 import type { FileReference } from '../../types'
 
-export function ChatPanel() {
+interface ChatPanelProps {
+  onSelectFile?: (path: string) => void
+}
+
+export function ChatPanel({ onSelectFile }: ChatPanelProps = {}) {
   const { repo, chatMessages, clearChat, setActivePanel } = useRepo()
   const { mutate: sendMessage, isPending } = useChat(repo?.id || null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -26,11 +30,10 @@ export function ChatPanel() {
   }
 
   const handleFileClick = (ref: FileReference) => {
-    // Navigate to file in explorer
     setActivePanel('explorer')
-    // The file selection would be handled by the parent component
-    // For now, we'll just log it
-    console.log('Navigate to file:', ref.path)
+    if (onSelectFile) {
+      onSelectFile(ref.path)
+    }
   }
 
   const handleExampleClick = (question: string) => {

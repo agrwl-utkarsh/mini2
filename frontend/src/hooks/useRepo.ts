@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, type AnalyzeRequest } from '../services/api'
 import { useRepo } from '../context/RepoContext'
@@ -25,52 +26,74 @@ export function useAnalyzeRepo() {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['repoStatus', response.repoId] })
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       updateRepoStatus('error', error.message)
     },
   })
 }
 
 export function useRepoStatus(repoId: string | null, enabled = true) {
-  const { updateRepoStatus: _updateRepoStatus } = useRepo()
+  const { updateRepoStatus } = useRepo()
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['repoStatus', repoId],
     queryFn: () => api.getStatus(repoId!),
     enabled: !!repoId && enabled,
-    refetchInterval: (query) => {
-      const data = query.state.data
+    refetchInterval: (q) => {
+      const data = q.state.data
       return data?.status === 'complete' || data?.status === 'error' ? false : 2000
     },
     gcTime: 0,
   })
+
+  useEffect(() => {
+    if (query.data) {
+      updateRepoStatus(query.data.status, query.data.error)
+    }
+  }, [query.data, updateRepoStatus])
+
+  return query
 }
 
 export function useRepoStats(repoId: string | null) {
-  const { setRepoStats: _setRepoStats } = useRepo()
+  const { setRepoStats } = useRepo()
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['repoStats', repoId],
     queryFn: () => api.getStats(repoId!),
     enabled: !!repoId,
     gcTime: 0,
   })
+
+  useEffect(() => {
+    if (query.data) {
+      setRepoStats(query.data)
+    }
+  }, [query.data, setRepoStats])
+
+  return query
 }
 
 export function useRepoStructure(repoId: string | null) {
-  const { setRepoTree: _setRepoTree } = useRepo()
+  const { setRepoTree } = useRepo()
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['repoStructure', repoId],
     queryFn: () => api.getStructure(repoId!),
     enabled: !!repoId,
     gcTime: 0,
   })
+
+  useEffect(() => {
+    if (query.data) {
+      setRepoTree(query.data)
+    }
+  }, [query.data, setRepoTree])
+
+  return query
 }
 
 export function useFileContent(repoId: string | null, filePath: string | null) {
-  const { setSelectedFile: _setSelectedFile } = useRepo()
-
   return useQuery({
     queryKey: ['fileContent', repoId, filePath],
     queryFn: () => api.getFile(repoId!, filePath!),
@@ -89,7 +112,7 @@ export function useExplainFile(repoId: string | null) {
 }
 
 export function useChat(repoId: string | null) {
-  const { addChatMessage } = useRepo()
+  const { addChatMessage, updateLastChatMessage } = useRepo()
 
   return useMutation({
     mutationFn: ({ question, contextFiles }: { question: string; contextFiles?: string[] }) =>
@@ -111,6 +134,19 @@ export function useChat(repoId: string | null) {
       addChatMessage(userMessage)
       addChatMessage(assistantMessage)
       return { assistantMessageId: assistantMessage.id }
+    },
+    onSuccess: (data) => {
+      updateLastChatMessage({
+        content: data.answer,
+        isLoading: false,
+        references: data.references,
+      })
+    },
+    onError: (error: Error) => {
+      updateLastChatMessage({
+        content: `Error: ${error.message || 'Failed to get response'}`,
+        isLoading: false,
+      })
     },
   })
 }

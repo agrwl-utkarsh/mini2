@@ -52,7 +52,7 @@ export const api = {
     fetchJson(`/repo/${repoId}/stats`),
 
   getFile: (repoId: string, filePath: string): Promise<FileContent> =>
-    fetchJson(`/repo/${repoId}/files/${encodeURIComponent(filePath)}`),
+    fetchJson(`/repo/${repoId}/files/${filePath.split('/').map(encodeURIComponent).join('/')}`),
 
   explainFile: (repoId: string, filePath: string): Promise<CodeExplanation> =>
     fetchJson(`/repo/${repoId}/explain`, {

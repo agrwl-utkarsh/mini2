@@ -14,7 +14,7 @@ AI-powered codebase understanding platform. Enter a GitHub URL, get an interacti
 
 - **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Python + FastAPI + GitPython
-- **AI**: Google Gemini API (optional, with fallback)
+- **AI**: Groq API (LLaMA 3.3 70B, with automatic keyword fallback)
 - **Deployment**: Vercel (frontend) + Railway/Render (backend)
 
 ## Quick Start
@@ -36,7 +36,7 @@ npm run build        # Production build
 ```bash
 cd backend
 cp .env.example .env
-# Add GEMINI_API_KEY to .env (optional)
+# Add GROQ_API_KEY to .env (optional)
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
@@ -110,9 +110,8 @@ VITE_API_URL=http://localhost:8000/api
 
 ### Backend (.env)
 ```
-GEMINI_API_KEY=your_key_here        # Optional
-REPO_BASE_PATH=/tmp/reposense
-CORS_ORIGINS=http://localhost:5173
+GROQ_API_KEY=your_key_here          # Optional (Groq LLaMA 3.3 70B)
+CORS_ORIGINS_STR=http://localhost:5173,http://localhost:3000
 ```
 
 ## Screenshots

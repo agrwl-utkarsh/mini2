@@ -73,7 +73,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     references: List[FileReference] = []
-    model: Literal["gemini", "fallback"]
+    model: Literal["gemini", "groq", "fallback"] = "groq"
 
 
 # Use plain class for Repository to avoid pydantic v1 issues

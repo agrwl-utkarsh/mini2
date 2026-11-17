@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, X, LayoutDashboard, FolderTree, FileText, MessageSquare, RefreshCw, Loader2 } from 'lucide-react'
 import { cn } from '../utils/cn'
 import { Button } from '../components/common'
@@ -6,6 +7,7 @@ import { FileTree } from '../components/explorer'
 import { FileContent } from '../components/explorer'
 import { CodeExplainer } from '../components/explainer'
 import { ChatPanel } from '../components/assistant'
+import { Dashboard } from '../components/dashboard'
 import { useRepo } from '../context/RepoContext'
 import { useRepoStatus, useRepoStats, useRepoStructure, useFileContent, useExplainFile, useChat } from '../hooks/useRepo'
 
@@ -19,6 +21,7 @@ const PANELS = [
 type PanelId = typeof PANELS[number]['id']
 
 export function AnalysisPage() {
+  const navigate = useNavigate()
   const {
     repo,
     setRepo,
@@ -33,6 +36,7 @@ export function AnalysisPage() {
   } = useRepo()
 
   const [repoId, setRepoId] = useState<string | null>(null)
+  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null)
   const [explorerWidth, setExplorerWidth] = useState(280)
   const [contentWidth, setContentWidth] = useState(320)
   const [isResizingExplorer, setIsResizingExplorer] = useState(false)
@@ -42,7 +46,7 @@ export function AnalysisPage() {
   useRepoStatus(repoId)
   useRepoStats(repoId)
   const structureQuery = useRepoStructure(repoId)
-  useFileContent(repoId, selectedFile?.path || null)
+  const fileContentQuery = useFileContent(repoId, selectedFilePath)
   const explainMutation = useExplainFile(repoId)
   useChat(repoId)
 
@@ -53,18 +57,30 @@ export function AnalysisPage() {
     }
   }, [repo, repoId])
 
-  const handleFileSelect = useCallback((_path: string) => {
-    setSelectedFile(null)
+  // Sync selected file content
+  useEffect(() => {
+    if (fileContentQuery.data) {
+      setSelectedFile(fileContentQuery.data)
+    }
+  }, [fileContentQuery.data, setSelectedFile])
+
+  const handleFileSelect = useCallback((path: string) => {
+    setSelectedFilePath(path)
     setFileExplanation(null)
-  }, [setSelectedFile, setFileExplanation])
+    if (activePanel === 'dashboard') {
+      setActivePanel('explorer')
+    }
+  }, [setSelectedFilePath, setFileExplanation, activePanel, setActivePanel])
 
   const handleExplain = useCallback(() => {
     if (selectedFile) {
+      setActivePanel('explainer')
       explainMutation.mutate(selectedFile.path)
     }
-  }, [selectedFile, explainMutation])
+  }, [selectedFile, explainMutation, setActivePanel])
 
   const handleCloseFile = useCallback(() => {
+    setSelectedFilePath(null)
     setSelectedFile(null)
     setFileExplanation(null)
   }, [setSelectedFile, setFileExplanation])
@@ -72,10 +88,12 @@ export function AnalysisPage() {
   const handleNewAnalysis = useCallback(() => {
     setRepo(null)
     setRepoId(null)
+    setSelectedFilePath(null)
     setSelectedFile(null)
     setFileExplanation(null)
     setSidebarOpen(true)
-  }, [setRepo, setSelectedFile, setFileExplanation, setSidebarOpen])
+    navigate('/')
+  }, [setRepo, setSelectedFile, setFileExplanation, setSidebarOpen, navigate])
 
   const handleSidebarToggle = useCallback(() => {
     setSidebarOpen(!sidebarOpen)
@@ -128,13 +146,27 @@ export function AnalysisPage() {
   }, [isResizingExplorer, isResizingContent, explorerWidth, selectedFile])
 
   if (!repo) {
-    return null
+    return (
+      <div className="flex h-screen bg-navy-950 items-center justify-center">
+        <div className="text-center p-8 max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-4">
+            <LayoutDashboard className="w-8 h-8 text-cyan-400" />
+          </div>
+          <h2 className="text-xl font-bold text-navy-100 mb-2">No Repository Loaded</h2>
+          <p className="text-navy-400 mb-6 text-sm">Please enter a GitHub repository URL on the home page to start analyzing.</p>
+          <Button variant="primary" onClick={() => navigate('/')}>
+            Go to Home
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   const isLoading = repo.status !== 'complete'
-  const showExplorer = activePanel === 'explorer' || selectedFile
-  const showContent = selectedFile && (activePanel === 'explainer' || activePanel === 'explorer')
-  const showExplainer = selectedFile && activePanel === 'explainer'
+  const isDashboard = activePanel === 'dashboard'
+  const showExplorer = !isDashboard && (activePanel === 'explorer' || activePanel === 'explainer' || !!selectedFile)
+  const showContent = !isDashboard && (selectedFile || activePanel === 'explorer' || activePanel === 'explainer')
+  const showExplainer = !isDashboard && !!selectedFile && activePanel === 'explainer'
   const showAssistant = activePanel === 'assistant'
 
   return (
@@ -150,7 +182,7 @@ export function AnalysisPage() {
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b border-navy-700">
           {sidebarOpen && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
                 <span className="text-navy-950 font-bold text-sm">RS</span>
               </div>
@@ -254,86 +286,94 @@ export function AnalysisPage() {
 
         {/* Content Area */}
         <div className="flex-1 flex overflow-hidden relative">
-          {/* Explorer Panel */}
-          {showExplorer && (
-            <div
-              className="flex flex-col panel border-r border-navy-700"
-              style={{ width: `${explorerWidth}px`, minWidth: '200px', maxWidth: '500px' }}
-            >
-              <FileTree
-                tree={repo.tree || null}
-                selectedPath={selectedFile?.path || ''}
-                onSelect={handleFileSelect}
-                onRefresh={() => structureQuery.refetch()}
-                isLoading={structureQuery.isLoading}
-              />
-            </div>
-          )}
-
-          {/* Content Resizer */}
-          {showContent && showExplorer && (
-            <div
-              onMouseDown={handleContentMouseDown}
-              className="w-1 cursor-col-resize bg-navy-700 hover:bg-cyan-500/30 transition-colors flex-shrink-0"
-              style={{ height: '100%' }}
-              aria-label="Resize content panel"
-              role="separator"
-              tabIndex={0}
-            />
-          )}
-
-          {/* Content Panel */}
-          {showContent ? (
-            <div
-              className="flex-1 flex flex-col min-w-0"
-              style={{ width: showExplorer ? `${contentWidth}px` : '100%' }}
-            >
-              <FileContent
-                file={selectedFile}
-                onClose={handleCloseFile}
-                onExplain={handleExplain}
-              />
+          {isDashboard ? (
+            <div className="flex-1 overflow-auto p-6">
+              <Dashboard repo={repo} isLoading={isLoading} />
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center text-navy-500 p-8">
-                <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg">Select a file to view its contents</p>
-              </div>
-            </div>
+            <>
+              {/* Explorer Panel */}
+              {showExplorer && (
+                <div
+                  className="flex flex-col panel border-r border-navy-700"
+                  style={{ width: `${explorerWidth}px`, minWidth: '200px', maxWidth: '500px' }}
+                >
+                  <FileTree
+                    tree={repo.tree || structureQuery.data || null}
+                    selectedPath={selectedFile?.path || selectedFilePath || ''}
+                    onSelect={handleFileSelect}
+                    onRefresh={() => structureQuery.refetch()}
+                    isLoading={structureQuery.isLoading}
+                  />
+                </div>
+              )}
+
+              {/* Content Resizer */}
+              {showContent && showExplorer && (
+                <div
+                  onMouseDown={handleContentMouseDown}
+                  className="w-1 cursor-col-resize bg-navy-700 hover:bg-cyan-500/30 transition-colors flex-shrink-0"
+                  style={{ height: '100%' }}
+                  aria-label="Resize content panel"
+                  role="separator"
+                  tabIndex={0}
+                />
+              )}
+
+              {/* Content Panel */}
+              {selectedFile ? (
+                <div
+                  className="flex-1 flex flex-col min-w-0"
+                  style={{ width: showExplorer ? `${contentWidth}px` : '100%' }}
+                >
+                  <FileContent
+                    file={selectedFile}
+                    onClose={handleCloseFile}
+                    onExplain={handleExplain}
+                  />
+                </div>
+              ) : fileContentQuery.isLoading ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center text-navy-400 p-8 space-y-3">
+                    <Loader2 className="w-8 h-8 mx-auto animate-spin text-cyan-400" />
+                    <p className="text-sm">Loading file content...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center text-navy-500 p-8">
+                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">Select a file to view its contents</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Explainer Panel Resizer */}
+              {showExplainer && (
+                <div
+                  className="w-1 cursor-col-resize bg-navy-700 hover:bg-cyan-500/30 transition-colors flex-shrink-0"
+                  style={{ height: '100%' }}
+                  aria-label="Resize explainer panel"
+                  role="separator"
+                  tabIndex={0}
+                />
+              )}
+
+              {/* Explainer Panel */}
+              {showExplainer && (
+                <div className="w-96 flex-shrink-0 border-l border-navy-700 bg-navy-900/80">
+                  <CodeExplainer
+                    explanation={fileExplanation}
+                    isLoading={explainMutation.isPending}
+                    onRefresh={() => selectedFile && explainMutation.mutate(selectedFile.path)}
+                  />
+                </div>
+              )}
+            </>
           )}
 
-          {/* Explainer Panel Resizer */}
-          {showExplainer && showContent && (
-            <div
-              className="w-1 cursor-col-resize bg-navy-700 hover:bg-cyan-500/30 transition-colors flex-shrink-0"
-              style={{ height: '100%' }}
-              aria-label="Resize explainer panel"
-              role="separator"
-              tabIndex={0}
-            />
-          )}
-
-          {/* Explainer Panel */}
-          {showExplainer && (
-            <div className="w-96 flex-shrink-0 border-l border-navy-700 bg-navy-900/80">
-              <CodeExplainer
-                explanation={fileExplanation}
-                isLoading={explainMutation.isPending}
-                onRefresh={() => selectedFile && explainMutation.mutate(selectedFile.path)}
-              />
-            </div>
-          )}
-
-          {/* Assistant Panel */}
-          {showAssistant && !showExplorer && !showContent && (
-            <div className="flex-1">
-              <ChatPanel />
-            </div>
-          )}
-
-          {/* Assistant Overlay for other panels */}
-          {showAssistant && (showExplorer || showContent) && (
+          {/* Assistant Overlay */}
+          {showAssistant && (
             <div className="absolute inset-0 z-50 bg-navy-950/95 backdrop-blur-sm flex flex-col">
               <div className="flex items-center justify-between p-3 border-b border-navy-700">
                 <h3 className="font-semibold text-navy-100 flex items-center gap-2">
@@ -345,7 +385,7 @@ export function AnalysisPage() {
                 </Button>
               </div>
               <div className="flex-1">
-                <ChatPanel />
+                <ChatPanel onSelectFile={handleFileSelect} />
               </div>
             </div>
           )}

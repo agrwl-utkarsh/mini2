@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 import uuid
 import threading
+import urllib.parse
 from app.models.schemas import (
     AnalyzeRequest, AnalyzeResponse, RepoStatusResponse, 
     Repository, RepositoryStats, FileTreeNode, FileContent,
@@ -88,39 +89,6 @@ async def analyze_repo(request: AnalyzeRequest):
     process_repository_sync(repo_id, url)
     
     return AnalyzeResponse(repo_id=repo_id, status="complete")
-    """Background task to clone, scan, and analyze repository."""
-    lock = get_lock(repo_id)
-    git_service = GitService()
-    
-    try:
-        with lock:
-            repo = repos.get(repo_id)
-            if not repo:
-                return
-            
-            # Clone
-            repo.status = "cloning"
-            repo.updated_at = __import__('datetime').datetime.now()
-            _, local_path = git_service.clone_repo(url)
-            
-            # Scan
-            repo.status = "scanning"
-            repo.updated_at = __import__('datetime').datetime.now()
-            tree, stats = scan_repository(local_path)
-            repo.tree = tree
-            repo.stats = stats
-            
-            # Complete
-            repo.status = "complete"
-            repo.updated_at = __import__('datetime').datetime.now()
-            
-    except Exception as e:
-        with lock:
-            repo = repos.get(repo_id)
-            if repo:
-                repo.status = "error"
-                repo.error = str(e)
-                repo.updated_at = __import__('datetime').datetime.now()
 
 
 @router.get("/{repo_id}/status", response_model=RepoStatusResponse)
@@ -161,6 +129,7 @@ async def get_file_content(repo_id: str, file_path: str):
     if not repo:
         raise HTTPException(status_code=404, detail="Repository not found")
     
+    file_path = urllib.parse.unquote(file_path).lstrip("/\\")
     git_service = GitService()
     local_path = git_service.get_repo_path(repo_id)
     full_path = os.path.join(local_path, file_path)
@@ -202,6 +171,7 @@ async def explain_file(repo_id: str, request: dict):
     if not file_path:
         raise HTTPException(status_code=400, detail="file_path required")
     
+    file_path = urllib.parse.unquote(file_path).lstrip("/\\")
     git_service = GitService()
     local_path = git_service.get_repo_path(repo_id)
     full_path = os.path.join(local_path, file_path)
@@ -296,6 +266,3 @@ async def delete_repo(repo_id: str):
         del repo_locks[repo_id]
     
     return {"message": "Repository deleted"}
-
-
-import os
