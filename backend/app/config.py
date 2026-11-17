@@ -16,9 +16,9 @@ class Settings(BaseSettings):
     MAX_REPO_SIZE_MB: int = 500
     MAX_FILES: int = 5000
     
-    # Gemini AI
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    # Groq AI
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
     
     # Analysis
     ANALYSIS_TIMEOUT: int = 300

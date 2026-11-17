@@ -7,27 +7,29 @@ from app.models.schemas import FileReference, ChatResponse, FileContent
 
 class AIService:
     def __init__(self):
-        self.api_key = settings.GEMINI_API_KEY
-        self.model_name = settings.GEMINI_MODEL
-        self._model = None
+        self.api_key = settings.GROQ_API_KEY
+        self.model_name = settings.GROQ_MODEL
+        self._client = None
         
         if self.api_key:
             try:
-                import google.generativeai as genai
-                genai.configure(api_key=self.api_key)
-                self._model = genai.GenerativeModel(self.model_name)
+                from openai import OpenAI
+                self._client = OpenAI(
+                    api_key=self.api_key,
+                    base_url="https://api.groq.com/openai/v1"
+                )
             except Exception:
-                self._model = None
+                self._client = None
 
     def is_available(self) -> bool:
-        return self._model is not None
+        return self._client is not None
 
     def chat(self, question: str, repo_context: List[FileContent], repo_tree: str = "") -> ChatResponse:
         if self.is_available():
-            return self._gemini_chat(question, repo_context, repo_tree)
+            return self._groq_chat(question, repo_context, repo_tree)
         return self._fallback_chat(question, repo_context, repo_tree)
 
-    def _gemini_chat(self, question: str, repo_context: List[FileContent], repo_tree: str) -> ChatResponse:
+    def _groq_chat(self, question: str, repo_context: List[FileContent], repo_tree: str) -> ChatResponse:
         try:
             context_parts = []
             if repo_tree:
@@ -45,11 +47,19 @@ Question: {question}
 
 Answer concisely. Include file references in format [file:path] when relevant."""
 
-            response = self._model.generate_content(prompt)
-            answer = response.text or "No response generated"
+            response = self._client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {"role": "system", "content": "You are a helpful code assistant that analyzes GitHub repositories."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=1500
+            )
+            answer = response.choices[0].message.content or "No response generated"
             
             refs = self._extract_references(answer)
-            return ChatResponse(answer=answer, references=refs, model="gemini")
+            return ChatResponse(answer=answer, references=refs, model="groq")
         except Exception as e:
             return self._fallback_chat(question, repo_context, repo_tree)
 
@@ -86,7 +96,7 @@ Answer concisely. Include file references in format [file:path] when relevant.""
                 # Show first few lines as preview
                 preview = '\n'.join(fc.content.split('\n')[:10])
                 answer += f"```{fc.language.lower()}\n{preview}\n```\n\n"
-            answer += "\n*Note: This is a basic fallback response. Configure GEMINI_API_KEY for AI-powered answers.*"
+            answer += "\n*Note: This is a basic fallback response. Configure GROQ_API_KEY for AI-powered answers.*"
         
         refs = [FileReference(path=fc.path) for fc in top_files]
         return ChatResponse(answer=answer, references=refs, model="fallback")

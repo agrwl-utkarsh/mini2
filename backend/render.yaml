@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: reposense-api
+    runtime: python
+    pythonVersion: "3.11"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://mini2-97sb1acoq-uagarwal212-5073.vercel.app"
+      - key: REPO_BASE_PATH
+        value: "/tmp/reposense"
+      - key: MAX_REPO_SIZE_MB
+        value: "100"
+      - key: MAX_FILES
+        value: "1000"
