@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Repo Explainer — Project Presentation</title>
+  <title>GitHub Repo Explainer — 5-Slide Foundation Preview</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,20 +11,16 @@
     :root {
       --bg-white: #ffffff;
       --bg-canvas: #f8fafc;
-      --surface: #ffffff;
-      --card-bg: #f9fafb;
-      --card-accent: #eff6ff;
+      --card-bg: #f8fafc;
+      --card-blue: #eff6ff;
       --border: #e2e8f0;
-      --border-accent: #bfdbfe;
+      --border-blue: #bfdbfe;
       --text-main: #0f172a;
       --text-muted: #334155;
       --text-soft: #64748b;
       --blue-primary: #2563eb;
       --blue-hover: #1d4ed8;
-      --blue-subtle: #dbeafe;
-      --blue-tag: #1e40af;
-      --green-tag: #065f46;
-      --green-bg: #d1fae5;
+      --blue-badge: #dbeafe;
     }
 
     * {
@@ -53,7 +49,6 @@
       gap: 14px;
     }
 
-    /* Top bar */
     .deck-topbar {
       display: flex;
       justify-content: space-between;
@@ -78,13 +73,6 @@
       background: var(--blue-primary);
     }
 
-    .deck-nav-hints {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 12px;
-    }
-
     .key-hint {
       display: inline-flex;
       align-items: center;
@@ -97,7 +85,6 @@
       color: var(--text-muted);
     }
 
-    /* Main Slide Card */
     .slide-viewport {
       position: relative;
       background: var(--bg-white);
@@ -128,7 +115,6 @@
       opacity: 1;
     }
 
-    /* Header styling */
     .slide-header {
       display: flex;
       flex-direction: column;
@@ -136,18 +122,15 @@
     }
 
     .slide-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--blue-primary);
     }
 
     .slide-title {
-      font-size: 27px;
+      font-size: 28px;
       font-weight: 700;
       color: var(--text-main);
       letter-spacing: -0.02em;
@@ -155,14 +138,13 @@
     }
 
     .slide-subtitle {
-      font-size: 14.5px;
+      font-size: 15px;
       color: var(--text-muted);
       line-height: 1.5;
       font-weight: 400;
       max-width: 920px;
     }
 
-    /* Body */
     .slide-body {
       flex: 1;
       display: flex;
@@ -170,7 +152,6 @@
       margin: 18px 0 10px;
     }
 
-    /* Footer */
     .slide-footer {
       display: flex;
       justify-content: space-between;
@@ -181,7 +162,6 @@
       color: var(--text-soft);
     }
 
-    /* Card styling */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -193,8 +173,8 @@
     }
 
     .card.blue {
-      background: var(--card-accent);
-      border-color: var(--border-accent);
+      background: var(--card-blue);
+      border-color: var(--border-blue);
     }
 
     .card-label {
@@ -218,15 +198,6 @@
       line-height: 1.55;
     }
 
-    /* Layout Grids */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      width: 100%;
-      align-items: stretch;
-    }
-
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -234,7 +205,7 @@
       width: 100%;
     }
 
-    .grid-split {
+    .grid-split-img-left {
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
       gap: 24px;
@@ -242,15 +213,6 @@
       align-items: center;
     }
 
-    .grid-split-img-left {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      width: 100%;
-      align-items: center;
-    }
-
-    /* Slide Images */
     .slide-img-box {
       width: 100%;
       border-radius: 10px;
@@ -270,7 +232,6 @@
       object-fit: contain;
     }
 
-    /* Bottom Control Bar */
     .deck-controls {
       display: flex;
       justify-content: space-between;
@@ -340,7 +301,6 @@
       cursor: not-allowed;
     }
 
-    /* Clean bullet list */
     ul.clean-list {
       list-style: none;
       display: flex;
@@ -362,423 +322,178 @@
       color: var(--blue-primary);
       font-weight: bold;
     }
-
-    @media print {
-      body {
-        padding: 0;
-        background: #ffffff;
-      }
-      .deck-topbar, .deck-controls {
-        display: none;
-      }
-      .slide-viewport {
-        border: none;
-        box-shadow: none;
-        display: block;
-      }
-      .slide {
-        display: flex !important;
-        opacity: 1 !important;
-        position: relative;
-        page-break-after: always;
-        height: 100vh;
-      }
-    }
   </style>
 </head>
 <body>
 
   <div class="deck-container">
-    <!-- Top Bar -->
     <header class="deck-topbar">
       <div class="badge-live">
         <span class="dot"></span>
         <span style="font-weight: 600;">GitHub Repo Explainer</span>
         <span style="color: var(--border);">/</span>
-        <span>A Friendly Guide to Understanding Any Code Project</span>
+        <span>5-Slide Foundation Preview</span>
       </div>
       <div class="deck-nav-hints">
-        <span>Use keys: <span class="key-hint">←</span> <span class="key-hint">→</span> or <span class="key-hint">Space</span></span>
+        <span>Use: <span class="key-hint">←</span> <span class="key-hint">→</span> or <span class="key-hint">Space</span></span>
         <span style="color: var(--border);">|</span>
         <button id="fullscreen-btn" class="btn" style="padding: 3px 8px; font-size: 11px;">Full Screen</button>
       </div>
     </header>
 
-    <!-- Main Presentation Window -->
     <main class="slide-viewport" id="viewport">
 
       <!-- ============================================== -->
-      <!-- SLIDE 1: INTRODUCTORY SLIDE (Slide 1 of 10)     -->
+      <!-- SLIDE 1: INTRODUCTION                          -->
       <!-- ============================================== -->
       <section class="slide active" data-slide="1">
         <div class="slide-header">
-          <div class="slide-tag">Welcome & Introduction</div>
+          <div class="slide-tag">Slide 01 · Welcome & Overview</div>
           <h1 class="slide-title" style="font-size: 38px; margin-top: 6px;">GitHub Repo Explainer</h1>
           <p class="slide-subtitle" style="font-size: 16px; margin-top: 6px;">
-            A simple, friendly tool that turns complicated computer code projects into clear, everyday English anyone can understand.
+            A friendly, everyday guide that turns complex open-source software projects into clear, conversational English anyone can understand.
           </p>
         </div>
 
         <div class="slide-body">
           <div class="grid-3" style="width: 100%;">
             <div class="card blue">
-              <div class="card-label">What It Is</div>
-              <div class="card-title">A Helpful Guide for Curious People</div>
-              <p class="card-desc">Think of it like having an experienced, patient friend sitting next to you, explaining what a software project does without confusing words.</p>
+              <div class="card-label">The Core Mission</div>
+              <div class="card-title">Making Code Approachable</div>
+              <p class="card-desc">Think of it like having an experienced, patient friend sitting right beside you, explaining what a codebase does without intimidating words.</p>
             </div>
 
             <div class="card">
-              <div class="card-label">How You Use It</div>
+              <div class="card-label">Frictionless Experience</div>
               <div class="card-title">Just Paste a Link</div>
-              <p class="card-desc">No accounts to create, no software to download, and no coding knowledge needed. Just paste a link and press one button.</p>
+              <p class="card-desc">No accounts to create, no software to install, and no environment setup. Just paste any GitHub repository link and click one button.</p>
             </div>
 
             <div class="card">
-              <div class="card-label">Why It's Special</div>
-              <div class="card-title">Reliable & Always Ready</div>
-              <p class="card-desc">Backed by 5 smart helpers working behind the scenes. If one helper is busy or down, another steps in instantly so you never see an error.</p>
+              <div class="card-label">Built to Last</div>
+              <div class="card-title">Always Fast & Reliable</div>
+              <p class="card-desc">Powered by multiple smart helpers behind the scenes. If one helper is busy or down, another steps in instantly so you never see an error.</p>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div>Introductory Overview · GitHub Repo Explainer</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 01 of 10</div>
+          <div>Introductory Slide · Welcome & Project Overview</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 01 of 05</div>
         </footer>
       </section>
 
       <!-- ============================================== -->
-      <!-- SLIDE 2: EXPLANATION 1 — THE COMMON PROBLEM     -->
+      <!-- SLIDE 2: THE PROBLEM (Day-One Onboarding Shock) -->
       <!-- ============================================== -->
       <section class="slide" data-slide="2">
         <div class="slide-header">
-          <div class="slide-tag">The Problem We Solve</div>
-          <h2 class="slide-title">Why Looking at Code Projects is Frustrating</h2>
+          <div class="slide-tag">Slide 02 · The Problem</div>
+          <h2 class="slide-title">The Day-One Shock: Walking Into a Massive Codebase Blind</h2>
           <p class="slide-subtitle">
-            Most software pages are written by technical experts for other experts, leaving students, beginners, and everyday team members completely lost.
+            When junior engineers and beginners get into open source or join a new company, they are suddenly handed thousands of lines of unfamiliar logic with no guided tour.
           </p>
         </div>
 
         <div class="slide-body">
           <div class="grid-split-img-left">
             <div class="slide-img-box">
-              <img src="assets/diagram_problem.png" alt="Comparison between confusing technical README and our clear conversational approach">
-            </div>
-
-            <div class="card" style="height: 100%; justify-content: center;">
-              <div class="card-label">The Core Frustration</div>
-              <div class="card-title">Information Overload & Jargon</div>
-              <ul class="clean-list" style="margin-top: 12px;">
-                <li><span class="bullet">✕</span> <strong>Too much jargon:</strong> Words like "RPC", "middleware", and "WASM" with zero simple definitions.</li>
-                <li><span class="bullet">✕</span> <strong>Skips the big picture:</strong> Jumps straight into 50 installation commands without explaining what the app does.</li>
-                <li><span class="bullet">✕</span> <strong>Intimidating to read:</strong> Makes curious learners and non-technical stakeholders feel left out.</li>
-                <li><span class="bullet">✓</span> <strong>Our Solution:</strong> We strip away the noise and explain the project conceptually first.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <footer class="slide-footer">
-          <div>Explanation 1 of 8 · The Problem: High Cognitive Barrier in Open Source</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 02 of 10</div>
-        </footer>
-      </section>
-
-      <!-- ============================================== -->
-      <!-- SLIDE 3: EXPLANATION 2 — HOW TO USE IT (USER)  -->
-      <!-- ============================================== -->
-      <section class="slide" data-slide="3">
-        <div class="slide-header">
-          <div class="slide-tag">How It Works For You</div>
-          <h2 class="slide-title">Three Effortless Steps: From Link to Understanding</h2>
-          <p class="slide-subtitle">
-            Anyone can use the tool in less than 10 seconds. You don't need any special skills or account sign-ups.
-          </p>
-        </div>
-
-        <div class="slide-body">
-          <div class="slide-img-box" style="width: 100%;">
-            <img src="assets/diagram_steps.png" alt="3 Simple Steps: Paste Link, AI Reads, Read Like a Story">
-          </div>
-        </div>
-
-        <footer class="slide-footer">
-          <div>Explanation 2 of 8 · User Journey: Zero-Friction 3-Step Experience</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 03 of 10</div>
-        </footer>
-      </section>
-
-      <!-- ============================================== -->
-      <!-- SLIDE 4: EXPLANATION 3 — BEHIND THE SCENES      -->
-      <!-- ============================================== -->
-      <section class="slide" data-slide="4">
-        <div class="slide-header">
-          <div class="slide-tag">Behind The Scenes</div>
-          <h2 class="slide-title">What Happens When You Click "Explain"</h2>
-          <p class="slide-subtitle">
-            A quick, quiet relay race takes place across four simple stations to deliver your friendly explanation in under two seconds.
-          </p>
-        </div>
-
-        <div class="slide-body">
-          <div class="slide-img-box" style="width: 100%;">
-            <img src="assets/diagram_journey.png" alt="4 Step Flow: Browser to Server to Files to AI Mentor">
-          </div>
-        </div>
-
-        <footer class="slide-footer">
-          <div>Explanation 3 of 8 · System Journey: From Link Validation to Delivery</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 04 of 10</div>
-        </footer>
-      </section>
-
-      <!-- ============================================== -->
-      <!-- SLIDE 5: EXPLANATION 4 — SAFETY NET & BACKUPS   -->
-      <!-- ============================================== -->
-      <section class="slide" data-slide="5">
-        <div class="slide-header">
-          <div class="slide-tag">Reliability Feature</div>
-          <h2 class="slide-title">Our 5-Tier Backup Team: Built to Never Break</h2>
-          <p class="slide-subtitle">
-            Online services sometimes go down or get overloaded. We built an automatic safety net so you will never see an empty error screen.
-          </p>
-        </div>
-
-        <div class="slide-body">
-          <div class="grid-split">
-            <div class="slide-img-box">
-              <img src="assets/diagram_backup.png" alt="5-Tier AI Backup Cascade">
+              <img src="assets/slide2_problem.png" alt="Day-One Reality vs The Onboarding Barrier">
             </div>
 
             <div class="card blue" style="height: 100%; justify-content: center;">
-              <div class="card-label">How Automatic Hand-off Works</div>
-              <div class="card-title">Like an Olympic Relay Team</div>
-              <p class="card-desc">
-                If our primary AI helper is busy, resting, or hits a rate limit, the request is handed to the next helper in a fraction of a second.
-              </p>
+              <div class="card-label">The Beginner's Dilemma</div>
+              <div class="card-title">Lost in Nested Files & Logic</div>
               <ul class="clean-list" style="margin-top: 10px;">
-                <li><span class="bullet">•</span> <strong>Tier 1:</strong> Fast, conversational xAI Grok.</li>
-                <li><span class="bullet">•</span> <strong>Tiers 2 & 3:</strong> Google Gemini and DeepSeek.</li>
-                <li><span class="bullet">•</span> <strong>Tiers 4 & 5:</strong> Free community model networks.</li>
-                <li><span class="bullet">•</span> <strong>Ultimate Safety Net:</strong> Shows the clean text so you always get value.</li>
+                <li><span class="bullet">•</span> <strong>Overwhelming volume:</strong> Handed 50,000+ lines of code across hundreds of files on day one.</li>
+                <li><span class="bullet">•</span> <strong>No starting map:</strong> You don't know which files matter, where logic begins, or why decisions were made.</li>
+                <li><span class="bullet">•</span> <strong>Hesitation to bother seniors:</strong> Beginners fear asking "stupid" questions every ten minutes.</li>
+                <li><span class="bullet">•</span> <strong>The Result:</strong> Days turn into weeks of staring at screens instead of building confidence.</li>
               </ul>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div>Explanation 4 of 8 · Reliability: Multi-Provider Redundancy Matrix</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 05 of 10</div>
+          <div>Explanation 1 of 8 · The Problem: Onboarding Friction for Junior Engineers</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 02 of 05</div>
         </footer>
       </section>
 
       <!-- ============================================== -->
-      <!-- SLIDE 6: EXPLANATION 5 — THE TEACHING RECIPE     -->
+      <!-- SLIDE 3: THE SOLUTION (On-Demand Senior Mentor) -->
       <!-- ============================================== -->
-      <section class="slide" data-slide="6">
+      <section class="slide" data-slide="3">
         <div class="slide-header">
-          <div class="slide-tag">Quality & Tone</div>
-          <h2 class="slide-title">The Teaching Recipe: How We Keep It Friendly</h2>
+          <div class="slide-tag">Slide 03 · The Solution</div>
+          <h2 class="slide-title">The Solution: An On-Demand Senior Mentor in Your Browser</h2>
           <p class="slide-subtitle">
-            We don't just summarize; we teach. Strict rules make sure the response reads like a conversation, not a robotic manual.
-          </p>
-        </div>
-
-        <div class="slide-body">
-          <div class="grid-split">
-            <div class="slide-img-box">
-              <img src="assets/diagram_teaching.png" alt="Teaching Recipe: Problem, Analogy, Use Cases, Quick Start">
-            </div>
-
-            <div class="card" style="height: 100%; justify-content: center;">
-              <div class="card-label">Strict Teaching Guardrails</div>
-              <div class="card-title">No Boring Robotic Summaries</div>
-              <ul class="clean-list" style="margin-top: 12px;">
-                <li><span class="bullet">✓</span> <strong>Real analogies:</strong> Relates code ideas to everyday things (whiteboards, libraries, recipes).</li>
-                <li><span class="bullet">✓</span> <strong>Conversational paragraphs:</strong> Talks naturally with "you" and "we" instead of cold textbook bullet points.</li>
-                <li><span class="bullet">✓</span> <strong>Clear definitions:</strong> Explains tricky terms the moment they appear.</li>
-                <li><span class="bullet">✕</span> <strong>Zero copying:</strong> Never blindly copies paragraphs from the original page.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <footer class="slide-footer">
-          <div>Explanation 5 of 8 · Pedagogy: Emulating a 1-on-1 Mentorship Walkthrough</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 06 of 10</div>
-        </footer>
-      </section>
-
-      <!-- ============================================== -->
-      <!-- SLIDE 7: EXPLANATION 6 — WHO USES THIS?         -->
-      <!-- ============================================== -->
-      <section class="slide" data-slide="7">
-        <div class="slide-header">
-          <div class="slide-tag">Audience & Real-World Use</div>
-          <h2 class="slide-title">Who Benefits From This Tool?</h2>
-          <p class="slide-subtitle">
-            This tool bridges the communication gap between technical code and human understanding for people with different goals.
-          </p>
-        </div>
-
-        <div class="slide-body">
-          <div class="grid-3" style="width: 100%;">
-            <div class="card">
-              <div class="card-label">Audience 01</div>
-              <div class="card-title">Coding Students & Beginners</div>
-              <p class="card-desc">
-                When you're learning to code, reading big projects on GitHub is intimidating. This tool gives learners a gentle starting point and builds confidence.
-              </p>
-              <div style="margin-top: 8px; font-size: 12.5px; color: var(--blue-primary); font-weight: 600;">
-                Saves hours of confusion on day one
-              </div>
-            </div>
-
-            <div class="card blue">
-              <div class="card-label">Audience 02</div>
-              <div class="card-title">Designers & Product Managers</div>
-              <p class="card-desc">
-                Team members who don't write code can quickly understand what an engineering team is building, making collaboration easy and painless.
-              </p>
-              <div style="margin-top: 8px; font-size: 12.5px; color: var(--blue-primary); font-weight: 600;">
-                Bridges technical & creative teams
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Audience 03</div>
-              <div class="card-title">Busy Professional Developers</div>
-              <p class="card-desc">
-                Senior engineers evaluate dozens of code tools each week. Instead of spending 20 minutes reading through each one, they get the gist in 30 seconds.
-              </p>
-              <div style="margin-top: 8px; font-size: 12.5px; color: var(--blue-primary); font-weight: 600;">
-                Accelerates tool discovery 10x
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <footer class="slide-footer">
-          <div>Explanation 6 of 8 · Practical Value: High Impact Across Diverse User Groups</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 07 of 10</div>
-        </footer>
-      </section>
-
-      <!-- ============================================== -->
-      <!-- SLIDE 8: EXPLANATION 7 — CLEAN & CAREFREE BUILD -->
-      <!-- ============================================== -->
-      <section class="slide" data-slide="8">
-        <div class="slide-header">
-          <div class="slide-tag">Simple By Design</div>
-          <h2 class="slide-title">Built Clean: Fast, Private, and Lightweight</h2>
-          <p class="slide-subtitle">
-            We intentionally kept the software simple so it loads instantly on any phone or laptop without hidden complexities.
-          </p>
-        </div>
-
-        <div class="slide-body">
-          <div class="grid-2">
-            <div class="card">
-              <div class="card-label">Privacy First</div>
-              <div class="card-title">Zero Personal Data Stored</div>
-              <p class="card-desc">
-                We do not collect personal information, passwords, or emails. We don't have a database tracking your searches. Once your explanation is finished, it disappears safely.
-              </p>
-              <ul class="clean-list" style="margin-top: 10px;">
-                <li><span class="bullet">•</span> No user logins or passwords required.</li>
-                <li><span class="bullet">•</span> No cookies or ads tracking you around the web.</li>
-                <li><span class="bullet">•</span> Completely private and respectful.</li>
-              </ul>
-            </div>
-
-            <div class="card blue">
-              <div class="card-label">Speed & Reliability</div>
-              <div class="card-title">Instant Loading Worldwide</div>
-              <p class="card-desc">
-                Hosted across global cloud servers (via Vercel). Whether you're opening it from New York, London, or Tokyo, the page loads in a blink of an eye.
-              </p>
-              <ul class="clean-list" style="margin-top: 10px;">
-                <li><span class="bullet">•</span> Lightweight build (tiny file size under 60 KB).</li>
-                <li><span class="bullet">•</span> Runs smoothly even on slow mobile connections.</li>
-                <li><span class="bullet">•</span> Costs $0 to run using smart free tiers.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <footer class="slide-footer">
-          <div>Explanation 7 of 8 · Architecture: Privacy-Centric, Stateless, and Fast</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 08 of 10</div>
-        </footer>
-      </section>
-
-      <!-- ============================================== -->
-      <!-- SLIDE 9: EXPLANATION 8 — FUTURE ROADMAP         -->
-      <!-- ============================================== -->
-      <section class="slide" data-slide="9">
-        <div class="slide-header">
-          <div class="slide-tag">Looking Ahead</div>
-          <h2 class="slide-title">What's Coming Next: The Future Roadmap</h2>
-          <p class="slide-subtitle">
-            While today's tool is great at explaining code summaries, we have exciting visual and interactive features planned right inside the app.
+            Instead of suffering in silence or digging through dense files, junior developers get a patient companion whose only job is to explain any project clearly.
           </p>
         </div>
 
         <div class="slide-body">
           <div class="slide-img-box" style="width: 100%;">
-            <img src="assets/diagram_roadmap.png" alt="Future Roadmap: Current Explainer, Visual Flow, Chatbot, Code Explorer">
+            <img src="assets/slide3_solution.png" alt="3 Simple Steps: Link, Mentor Walkthrough, Confident Beginner">
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div>Explanation 8 of 8 · Product Evolution: Expanding into a Full Learning Hub</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 09 of 10</div>
+          <div>Explanation 2 of 8 · The Solution: Zero-Friction 3-Step Walkthrough</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 03 of 05</div>
         </footer>
       </section>
 
       <!-- ============================================== -->
-      <!-- SLIDE 10: CONCLUDING SLIDE (Slide 10 of 10)     -->
+      <!-- SLIDE 4: THE CONCEPT (Everyday Analogies & Why)  -->
       <!-- ============================================== -->
-      <section class="slide" data-slide="10">
+      <section class="slide" data-slide="4">
         <div class="slide-header">
-          <div class="slide-tag">Summary & Closing</div>
-          <h2 class="slide-title">Making Technology Understandable for Everyone</h2>
+          <div class="slide-tag">Slide 04 · The Concept</div>
+          <h2 class="slide-title">The Concept: How It Translates Code into Human Concepts</h2>
           <p class="slide-subtitle">
-            A quick recap of how GitHub Repo Explainer transforms confusing code into clear learning.
+            Rather than spitting out code line-by-line, the explainer focuses on human mental models, everyday analogies, and the "why" behind the software.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-3" style="width: 100%;">
-            <div class="card blue">
-              <div class="card-label">Takeaway 1</div>
-              <div class="card-title">Instant Clarity</div>
-              <p class="card-desc">Turns intimidating software jargon into friendly, easy-to-read explanations with everyday analogies anyone can grasp.</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Takeaway 2</div>
-              <div class="card-title">Reliable by Design</div>
-              <p class="card-desc">A five-tier safety net guarantees the system is always responsive and ready to help, without annoying error screens.</p>
-            </div>
-
-            <div class="card blue">
-              <div class="card-label">Takeaway 3</div>
-              <div class="card-title">Built for Everyone</div>
-              <p class="card-desc">Zero accounts, zero downloads, zero cost, and 100% private. Created to help curious people learn with confidence.</p>
-            </div>
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/slide4_concept.png" alt="Concept: The Why First, Everyday Analogies, Instant Jargon Relief, Gentle First Steps">
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div>Thank You · Repository: github.com/agrwl-utkarsh/mini2</div>
-          <div style="font-weight: 600; color: var(--blue-primary);">Slide 10 of 10</div>
+          <div>Explanation 3 of 8 · The Concept: Conceptual Translation vs Jargon Dumps</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 04 of 05</div>
+        </footer>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SLIDE 5: THE EXPERIENCE (60-Second Transformation) -->
+      <!-- ============================================== -->
+      <section class="slide" data-slide="5">
+        <div class="slide-header">
+          <div class="slide-tag">Slide 05 · The Experience</div>
+          <h2 class="slide-title">The Experience: From Total Confusion to Confident in 60 Seconds</h2>
+          <p class="slide-subtitle">
+            What the user actually sees: a cohesive, 5-paragraph narrative walkthrough that leaves them ready to contribute and discuss with their team.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/slide5_experience.png" alt="Live Interface Experience showing URL input and 5-paragraph mentor explanation">
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <div>Explanation 4 of 8 · The Experience: The 60-Second Transformation</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 05 of 05</div>
         </footer>
       </section>
 
     </main>
 
-    <!-- Bottom Controls -->
     <footer class="deck-controls">
       <div class="btn-group">
         <button id="prev-btn" class="btn" aria-label="Previous Slide">
@@ -792,18 +507,14 @@
       </div>
 
       <div class="indicators" id="indicators">
-        <!-- 10 dots generated by JS -->
+        <!-- 5 dots generated by JS -->
       </div>
 
       <div class="btn-group">
-        <a href="presentation.pptx" download="GitHub-Repo-Explainer.pptx" class="btn btn-primary" style="text-decoration: none;" title="Download PowerPoint presentation">
+        <a href="presentation.pptx" download="GitHub-Repo-Explainer-5Slides.pptx" class="btn btn-primary" style="text-decoration: none;" title="Download PowerPoint presentation">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9M4 8l4 4 4-4M2 14h12"/></svg>
           Download .PPTX
         </a>
-        <button id="print-btn" class="btn" title="Export as clean PDF or print">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6V2h8v4M4 12H2a1 1 0 01-1-1V7a1 1 0 011-1h12a1 1 0 011 1v4a1 1 0 01-1 1h-2M4 9h8v5H4V9z"/></svg>
-          Print / PDF
-        </button>
       </div>
     </footer>
   </div>
@@ -814,10 +525,8 @@
     const nextBtn = document.getElementById('next-btn');
     const indicatorsContainer = document.getElementById('indicators');
     const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const printBtn = document.getElementById('print-btn');
     let currentIndex = 0;
 
-    // Build indicators
     slides.forEach((_, i) => {
       const dot = document.createElement('div');
       dot.className = `indicator-dot ${i === 0 ? 'active' : ''}`;
@@ -829,12 +538,8 @@
     const dots = document.querySelectorAll('.indicator-dot');
 
     function updateSlide() {
-      slides.forEach((s, i) => {
-        s.classList.toggle('active', i === currentIndex);
-      });
-      dots.forEach((d, i) => {
-        d.classList.toggle('active', i === currentIndex);
-      });
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentIndex));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
       prevBtn.disabled = currentIndex === 0;
       nextBtn.disabled = currentIndex === slides.length - 1;
     }
@@ -849,7 +554,6 @@
     prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
     nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
 
-    // Keyboard navigation
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
         e.preventDefault();
@@ -873,10 +577,6 @@
       } else {
         document.exitFullscreen();
       }
-    });
-
-    printBtn.addEventListener('click', () => {
-      window.print();
     });
 
     updateSlide();
