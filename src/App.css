@@ -16,7 +16,7 @@ body {
 }
 
 .container {
-  max-width: 720px;
+  max-width: 640px;
   margin: 0 auto;
 }
 
@@ -135,78 +135,24 @@ h1 {
   font-size: 0.95rem;
 }
 
-.readme-toggle {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #f0f0f0;
-}
-
-.readme-toggle summary {
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #666;
-  margin-bottom: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f0f0f0;
-  display: inline-block;
-  transition: color 0.15s ease;
-}
-
-.readme-toggle summary:hover {
-  color: #e00;
-}
-
-.readme-content {
-  background: #fafafa;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  padding: 1.25rem;
-  overflow-x: auto;
-  font-size: 0.8rem;
-  line-height: 1.6;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', monospace;
-  color: #333;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-/* Scrollbar styling */
-.readme-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.readme-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.readme-content::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 3px;
-}
-
-.readme-content::-webkit-scrollbar-thumb:hover {
-  background: #ccc;
-}
-
 /* Responsive */
 @media (max-width: 600px) {
   body {
     padding: 2rem 1rem;
   }
-  
+
   h1 {
     font-size: 1.5rem;
   }
-  
+
   .analyze-form {
     flex-direction: column;
   }
-  
+
   .analyze-form button {
     width: 100%;
   }
-  
+
   .result {
     padding: 1.5rem;
   }

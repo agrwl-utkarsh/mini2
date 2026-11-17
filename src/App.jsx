@@ -4,33 +4,31 @@ import './App.css'
 function App() {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
+  const [explanation, setExplanation] = useState(null)
   const [error, setError] = useState('')
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-
-  const handleAnalyze = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!url.trim()) return
 
     setLoading(true)
     setError('')
-    setResult(null)
+    setExplanation(null)
 
     try {
-      const res = await fetch(`${API_BASE}/analyze`, {
+      const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() }),
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: 'Request failed' }))
-        throw new Error(err.detail || `HTTP ${res.status}`)
+        const err = await res.json().catch(() => ({ error: 'Request failed' }))
+        throw new Error(err.error || `HTTP ${res.status}`)
       }
 
       const data = await res.json()
-      setResult(data)
+      setExplanation(data.explanation)
     } catch (err) {
       setError(err.message || 'Something went wrong')
     } finally {
@@ -41,11 +39,11 @@ function App() {
   return (
     <div className="container">
       <header>
-        <h1>RepoSense</h1>
-        <p className="subtitle">Paste a GitHub repository URL to get a plain-English explanation of its README</p>
+        <h1>README Explainer</h1>
+        <p className="subtitle">Paste a GitHub repository URL to get a beginner-friendly explanation of its README</p>
       </header>
 
-      <form onSubmit={handleAnalyze} className="analyze-form">
+      <form onSubmit={handleSubmit} className="analyze-form">
         <input
           type="url"
           value={url}
@@ -61,15 +59,10 @@ function App() {
 
       {error && <div className="error">{error}</div>}
 
-      {result && (
+      {explanation && (
         <div className="result">
           <h2>Explanation</h2>
-          <div className="explanation">{result.explanation}</div>
-          
-          <details className="readme-toggle">
-            <summary>Show raw README</summary>
-            <pre className="readme-content">{result.readme}</pre>
-          </details>
+          <div className="explanation">{explanation}</div>
         </div>
       )}
     </div>
