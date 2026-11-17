@@ -7,88 +7,85 @@ from pptx.enum.shapes import MSO_SHAPE
 
 def create_deck():
     prs = Presentation()
-    # 16:9 widescreen dimensions (13.333 x 7.5 inches)
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     blank_layout = prs.slide_layouts[6]
 
-    # Clean color palette
-    c_bg = RGBColor(255, 255, 255)
-    c_card_bg = RGBColor(250, 251, 252)
-    c_card_accent = RGBColor(239, 246, 255)
-    c_border = RGBColor(229, 231, 235)
-    c_accent_border = RGBColor(219, 234, 254)
-    c_text_dark = RGBColor(17, 24, 39)
-    c_text_muted = RGBColor(75, 85, 99)
-    c_text_soft = RGBColor(107, 114, 128)
-    c_accent_blue = RGBColor(37, 99, 235)
+    # White theme with clean blue accents
+    c_white = RGBColor(255, 255, 255)
+    c_card_bg = RGBColor(249, 250, 251)
+    c_card_blue = RGBColor(239, 246, 255)
+    c_border = RGBColor(226, 232, 240)
+    c_border_blue = RGBColor(191, 219, 254)
+    c_text_dark = RGBColor(15, 23, 42)
+    c_text_muted = RGBColor(51, 65, 85)
+    c_text_soft = RGBColor(100, 116, 139)
+    c_blue_primary = RGBColor(37, 99, 235)
 
-    def add_header(slide, category, title, subtitle):
-        tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.55), Inches(11.733), Inches(1.5))
+    def add_header(slide, tag, title, subtitle):
+        tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.48), Inches(11.733), Inches(1.4))
         tf = tb.text_frame
         tf.word_wrap = True
         tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
 
-        # Category
-        p_cat = tf.paragraphs[0]
-        p_cat.text = category.upper()
-        p_cat.font.name = 'Arial'
-        p_cat.font.size = Pt(10)
-        p_cat.font.bold = True
-        p_cat.font.color.rgb = c_text_soft
-        p_cat.space_after = Pt(4)
+        p_tag = tf.paragraphs[0]
+        p_tag.text = tag.upper()
+        p_tag.font.name = 'Arial'
+        p_tag.font.size = Pt(10)
+        p_tag.font.bold = True
+        p_tag.font.color.rgb = c_blue_primary
+        p_tag.space_after = Pt(4)
 
-        # Title
         p_title = tf.add_paragraph()
         p_title.text = title
         p_title.font.name = 'Arial'
-        p_title.font.size = Pt(24)
+        p_title.font.size = Pt(23)
         p_title.font.bold = True
         p_title.font.color.rgb = c_text_dark
-        p_title.space_after = Pt(6)
+        p_title.space_after = Pt(4)
 
-        # Subtitle
         if subtitle:
             p_sub = tf.add_paragraph()
             p_sub.text = subtitle
             p_sub.font.name = 'Arial'
-            p_sub.font.size = Pt(13)
+            p_sub.font.size = Pt(12)
             p_sub.font.color.rgb = c_text_muted
 
-    def add_footer(slide, current_num, total_num=10, left_text="GitHub Repo Explainer · agrwl-utkarsh/mini2"):
-        tb = slide.shapes.add_textbox(Inches(0.8), Inches(6.8), Inches(11.733), Inches(0.4))
+    def add_footer(slide, current_num, total_num=10, note=""):
+        tb = slide.shapes.add_textbox(Inches(0.8), Inches(6.82), Inches(10.0), Inches(0.35))
         tf = tb.text_frame
         tf.word_wrap = True
         tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
         p = tf.paragraphs[0]
-        p.text = left_text
+        p.text = f"{note} · GitHub Repo Explainer" if note else "GitHub Repo Explainer"
         p.font.name = 'Arial'
         p.font.size = Pt(9.5)
         p.font.color.rgb = c_text_soft
 
-        tb_num = slide.shapes.add_textbox(Inches(11.5), Inches(6.8), Inches(1.0), Inches(0.4))
+        tb_num = slide.shapes.add_textbox(Inches(11.0), Inches(6.82), Inches(1.533), Inches(0.35))
         tf_num = tb_num.text_frame
         tf_num.word_wrap = True
         tf_num.margin_left = tf_num.margin_top = tf_num.margin_right = tf_num.margin_bottom = 0
         p_num = tf_num.paragraphs[0]
         p_num.alignment = PP_ALIGN.RIGHT
-        p_num.text = f"{current_num:02d} / {total_num:02d}"
+        p_num.text = f"Slide {current_num:02d} of {total_num:02d}"
         p_num.font.name = 'Arial'
+        p_num.font.bold = True
         p_num.font.size = Pt(9.5)
-        p_num.font.color.rgb = c_text_soft
+        p_num.font.color.rgb = c_blue_primary
 
-    def create_card(slide, left, top, width, height, label, title, text, accent=False):
+    def create_card(slide, left, top, width, height, label, title, text, blue_accent=False):
         shape = slide.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
             Inches(left), Inches(top), Inches(width), Inches(height)
         )
         shape.fill.solid()
-        shape.fill.fore_color.rgb = c_card_accent if accent else c_card_bg
-        shape.line.color.rgb = c_accent_border if accent else c_border
+        shape.fill.fore_color.rgb = c_card_blue if blue_accent else c_card_bg
+        shape.line.color.rgb = c_border_blue if blue_accent else c_border
         shape.line.width = Pt(1)
 
         tb = slide.shapes.add_textbox(
-            Inches(left + 0.25), Inches(top + 0.25), Inches(width - 0.5), Inches(height - 0.5)
+            Inches(left + 0.22), Inches(top + 0.22), Inches(width - 0.44), Inches(height - 0.44)
         )
         tf = tb.text_frame
         tf.word_wrap = True
@@ -100,7 +97,7 @@ def create_deck():
             p_lbl.font.name = 'Arial'
             p_lbl.font.size = Pt(9)
             p_lbl.font.bold = True
-            p_lbl.font.color.rgb = c_text_soft
+            p_lbl.font.color.rgb = c_blue_primary
             p_lbl.space_after = Pt(4)
             p_t = tf.add_paragraph()
         else:
@@ -108,184 +105,138 @@ def create_deck():
 
         p_t.text = title
         p_t.font.name = 'Arial'
-        p_t.font.size = Pt(15)
+        p_t.font.size = Pt(14)
         p_t.font.bold = True
         p_t.font.color.rgb = c_text_dark
-        p_t.space_after = Pt(8)
+        p_t.space_after = Pt(6)
 
         if text:
-            p_body = tf.add_paragraph()
-            p_body.text = text
-            p_body.font.name = 'Arial'
-            p_body.font.size = Pt(11.5)
-            p_body.font.color.rgb = c_text_muted
+            p_b = tf.add_paragraph()
+            p_b.text = text
+            p_b.font.name = 'Arial'
+            p_b.font.size = Pt(11)
+            p_b.font.color.rgb = c_text_muted
 
-    # --- SLIDE 1: Title ---
+    def add_image_box(slide, left, top, width, height, image_path):
+        if os.path.exists(image_path):
+            slide.shapes.add_picture(image_path, Inches(left), Inches(top), Inches(width), Inches(height))
+
+    # --- SLIDE 1: INTRODUCTORY SLIDE (Slide 1 of 10) ---
     s1 = prs.slides.add_slide(blank_layout)
-    add_header(s1, "Project Overview & Architecture", "GitHub Repo Explainer",
-               "A resilient, zero-friction developer tool that translates complex open-source repositories into clear, mentor-style conceptual explanations.")
-    create_card(s1, 0.8, 2.3, 3.65, 4.1, "Core Purpose", "Demystify Open Source",
-                "Paste any GitHub repository URL to receive an intuitive narrative breakdown without wading through dense jargon or inconsistent README files.")
-    create_card(s1, 4.84, 2.3, 3.65, 4.1, "System Architecture", "5-Tier Resilient Fallback",
-                "Engineered for 99.9% uptime with cascading multi-provider AI redundancy across Grok, Gemini, DeepSeek, OpenRouter, and Hugging Face.")
-    create_card(s1, 8.88, 2.3, 3.65, 4.1, "Stack & Delivery", "Modern Minimalist Web",
-                "Lightweight React + Vite single-page application powered by a Vercel Serverless Function backend with zero external database dependencies.")
-    add_footer(s1, 1)
+    add_header(s1, "Welcome & Introduction", "GitHub Repo Explainer",
+               "A simple, friendly tool that turns complicated computer code projects into clear, everyday English anyone can understand.")
+    create_card(s1, 0.8, 2.15, 3.65, 4.35, "What It Is", "A Helpful Guide for Curious People",
+                "Think of it like having an experienced, patient friend sitting right next to you, explaining what a software project does without confusing words.", blue_accent=True)
+    create_card(s1, 4.84, 2.15, 3.65, 4.35, "How You Use It", "Just Paste a Link",
+                "No accounts to create, no software to download, and no coding knowledge needed. Just copy a project link, paste it in, and click one button.")
+    create_card(s1, 8.88, 2.15, 3.65, 4.35, "Why It's Special", "Reliable & Always Ready",
+                "Backed by 5 smart helpers working behind the scenes. If one helper is busy or down, another steps in instantly so you never see an error screen.")
+    add_footer(s1, 1, note="Introductory Overview")
 
-    # --- SLIDE 2: Problem ---
+    # --- SLIDE 2: EXPLANATION 1 — The Problem ---
     s2 = prs.slides.add_slide(blank_layout)
-    add_header(s2, "The Problem", "The Friction of Navigating Open Source",
-               "Developers spend hours deciphering open-source codebases before writing a single line of code.")
-    create_card(s2, 0.8, 2.3, 5.65, 4.1, "The Status Quo", "Why Traditional READMEs Fail Readers",
-                "• Written for creators, not learners: READMEs assume extensive domain context, skipping high-level foundational mental models.\n\n"
-                "• Fragmented documentation: Critical explanations are scattered across wikis, issues, or omitted entirely.\n\n"
-                "• Boilerplate overload: Lengthy CLI commands, badge arrays, and configuration details obscure core value.\n\n"
-                "• Intimidating to juniors: Cryptic architectural jargon discourages new developers and non-technical stakeholders.")
-    create_card(s2, 6.88, 2.3, 5.65, 4.1, "The Opportunity", "The Need for an Automated Senior Mentor",
-                "\"Explain it like a senior engineer sitting right beside a junior developer during a 1-on-1 walkthrough.\"\n\n"
-                "Software needs a reliable translation layer: take raw repository technical documentation and distill it into intuitive concepts, practical analogies, and clear setup guidance.", accent=True)
-    add_footer(s2, 2)
+    add_header(s2, "The Problem We Solve", "Why Looking at Code Projects is Frustrating",
+               "Most software pages are written by technical experts for other experts, leaving students, beginners, and teammates lost.")
+    add_image_box(s2, 0.8, 2.1, 6.2, 4.4, "assets/diagram_problem.png")
+    create_card(s2, 7.25, 2.1, 5.28, 4.4, "The Core Frustration", "Information Overload & Jargon",
+                "• Too much jargon: Words like 'RPC', 'middleware', and 'WASM' without definitions.\n\n"
+                "• Skips the big picture: Jumps straight into 50 installation commands without explaining what the app does.\n\n"
+                "• Intimidating to read: Leaves curious learners and non-technical stakeholders feeling excluded.\n\n"
+                "• Our Solution: We strip away the noise and explain the project conceptually first.", blue_accent=True)
+    add_footer(s2, 2, note="Explanation 1 of 8: The Problem Space")
 
-    # --- SLIDE 3: Solution ---
+    # --- SLIDE 3: EXPLANATION 2 — How to use it ---
     s3 = prs.slides.add_slide(blank_layout)
-    add_header(s3, "The Solution", "An Intelligent, Conversational Distillation Engine",
-               "A single entry point turning any repository link into an engaging, structured learning experience.")
-    create_card(s3, 0.8, 2.3, 3.65, 4.1, "Input Simplicity", "Zero Friction Entry",
-                "No accounts, no repo cloning, no local environment installation. Paste an HTTP link or select one-click presets (Next.js, React, Vite, Tailwind CSS).")
-    create_card(s3, 4.84, 2.3, 3.65, 4.1, "Pedagogical Design", "Mentor-Style Synthesis",
-                "Strict system prompt instructions forbid repetitive bullet points and verbatim copying. Produces 5–6 cohesive paragraphs centered around 'Why', analogies, and real-world value.")
-    create_card(s3, 8.88, 2.3, 3.65, 4.1, "Graceful Resilience", "Never Shows a Broken Screen",
-                "Automated provider fallback prevents rate-limit lockouts. If all LLMs are unreachable, cleanly returns the sanitized README as an ultimate safety net.")
-    add_footer(s3, 3)
+    add_header(s3, "How It Works For You", "Three Effortless Steps: From Link to Understanding",
+               "Anyone can use the tool in less than 10 seconds. You don't need any special technical skills or account sign-ups.")
+    add_image_box(s3, 0.8, 2.1, 11.733, 4.4, "assets/diagram_steps.png")
+    add_footer(s3, 3, note="Explanation 2 of 8: User Journey")
 
-    # --- SLIDE 4: Architecture Pipeline ---
+    # --- SLIDE 4: EXPLANATION 3 — Behind the scenes ---
     s4 = prs.slides.add_slide(blank_layout)
-    add_header(s4, "System Architecture", "End-to-End Execution Pipeline",
-               "A lightweight, decoupled design optimizing for rapid response times and cold-start minimization.")
-    steps = [
-        ("1. Client URL", "React frontend parses user input, validates URLs, and offers 1-click popular repository presets."),
-        ("2. Serverless Proxy", "/api/analyze parses repo coordinates and keeps API credentials securely server-side."),
-        ("3. Ingestion", "Fetches raw docs across main/master branches and .md/.txt/.rst extensions via raw CDN."),
-        ("4. Fallback LLM", "Executes ordered provider calls with token truncation (8,000 chars) to prevent context blowup."),
-        ("5. Presentation", "Client streams output into tabbed workspaces: Explanation, Architecture, Chat, and Explorer.")
-    ]
-    for i, (stitle, sdesc) in enumerate(steps):
-        left = 0.8 + (i * 2.42)
-        create_card(s4, left, 2.3, 2.25, 4.1, f"Step 0{i+1}", stitle, sdesc)
-    add_footer(s4, 4)
+    add_header(s4, "Behind The Scenes", "What Happens When You Click 'Explain'",
+               "A quick, quiet relay race takes place across four simple stations to deliver your friendly explanation in under two seconds.")
+    add_image_box(s4, 0.8, 2.1, 11.733, 4.4, "assets/diagram_journey.png")
+    add_footer(s4, 4, note="Explanation 3 of 8: System Journey")
 
-    # --- SLIDE 5: 5-Tier LLM Matrix ---
+    # --- SLIDE 5: EXPLANATION 4 — 5-Tier Safety Net ---
     s5 = prs.slides.add_slide(blank_layout)
-    add_header(s5, "Engineering Highlight", "The 5-Tier Fault-Tolerant LLM Matrix",
-               "Zero-downtime AI generation: if any provider encounters rate limits or timeouts, execution cascades instantly.")
-    tiers = [
-        ("Tier 01", "xAI Grok", "grok-beta via api.x.ai/v1 (Primary Choice)", True),
-        ("Tier 02", "Google Gemini", "gemini-1.5-flash -> gemini-1.5-pro -> gemini-1.0-pro", False),
-        ("Tier 03", "DeepSeek", "deepseek-chat via api.deepseek.com/v1 (Cost Efficient)", False),
-        ("Tier 04", "OpenRouter", "llama-3.2-3b, phi-3-mini, gemma-2-2b, qwen-2.5-7b (Free Tier Pool)", False),
-        ("Tier 05", "Hugging Face", "Meta-Llama-3.1-8B-Instruct, Phi-3-mini-128k (Inference API)", False),
-        ("Safety Net", "Raw README Fallback", "Clean text excerpt (3,000 chars) + full transparent diagnostic trace", False)
-    ]
-    for i, (tnum, tname, tdesc, is_acc) in enumerate(tiers):
-        top = 2.3 + (i * 0.68)
-        shape = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(top), Inches(11.733), Inches(0.58))
-        shape.fill.solid()
-        shape.fill.fore_color.rgb = c_card_accent if is_acc else c_card_bg
-        shape.line.color.rgb = c_accent_border if is_acc else c_border
-        shape.line.width = Pt(1)
+    add_header(s5, "Reliability Feature", "Our 5-Tier Backup Team: Built to Never Break",
+               "Online services sometimes go down or get overloaded. We built an automatic safety net so you will never see an empty error screen.")
+    add_image_box(s5, 0.8, 2.1, 6.4, 4.4, "assets/diagram_backup.png")
+    create_card(s5, 7.45, 2.1, 5.08, 4.4, "How Hand-off Works", "Like an Olympic Relay Team",
+                "If our primary AI helper is busy, resting, or hits a rate limit, your request is passed to the next helper in a fraction of a second:\n\n"
+                "1. Tier 1: Fast, conversational xAI Grok\n"
+                "2. Tiers 2 & 3: Google Gemini & DeepSeek\n"
+                "3. Tiers 4 & 5: Free community model networks\n\n"
+                "Ultimate Safety Net: Clean document text preview with diagnostic notes so you always get immediate value.", blue_accent=True)
+    add_footer(s5, 5, note="Explanation 4 of 8: Multi-Tier Reliability")
 
-        tb = s5.shapes.add_textbox(Inches(1.0), Inches(top + 0.12), Inches(11.3), Inches(0.4))
-        tf = tb.text_frame
-        tf.word_wrap = True
-        tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
-        p = tf.paragraphs[0]
-        p.text = f"{tnum}  |  {tname}  —  {tdesc}"
-        p.font.name = 'Arial'
-        p.font.size = Pt(11)
-        p.font.color.rgb = c_text_dark
-        p.font.bold = is_acc
-    add_footer(s5, 5)
-
-    # --- SLIDE 6: Prompt Engineering ---
+    # --- SLIDE 6: EXPLANATION 5 — Teaching Recipe ---
     s6 = prs.slides.add_slide(blank_layout)
-    add_header(s6, "AI Quality & Pedagogy", "Prompt Engineering: The Mentor Persona",
-               "Transforming raw text dumping into high-signal educational content through rigorous prompt constraints.")
-    create_card(s6, 0.8, 2.3, 5.65, 4.1, "Pedagogical Framework", "Mandatory Narrative Structure",
-                "1. The Problem Space: Painting the before/after developer friction.\n\n"
-                "2. Conceptual Architecture: 'Think of it like...' everyday analogies.\n\n"
-                "3. Core Capabilities: Pragmatic capabilities over feature checklists.\n\n"
-                "4. First Steps: Gentle setup walkthrough from scratch.\n\n"
-                "5. Jargon Dissection: On-the-fly definitions of key technical terms.\n\n"
-                "6. Real-World Context: Identifying ideal use cases and project fits.")
-    create_card(s6, 6.88, 2.3, 5.65, 4.1, "Output Guardrails", "Strict Negative Prompting",
-                "CRITICAL SYSTEM RULES:\n\n"
-                "• DO NOT copy or quote README directly\n\n"
-                "• DO NOT output section-by-section lists\n\n"
-                "• Write ONLY in flowing, natural PARAGRAPHS (5-6 min)\n\n"
-                "• Conversational tone: use 'you' and 'we'\n\n"
-                "• Avoid academic or robotic summaries\n\n"
-                "Result: Human-sounding walkthrough that feels like a pairing session.")
-    add_footer(s6, 6)
+    add_header(s6, "Quality & Tone", "The Teaching Recipe: How We Keep It Friendly",
+               "We don't just summarize; we teach. Strict rules make sure the response reads like a conversation, not a robotic manual.")
+    add_image_box(s6, 0.8, 2.1, 6.4, 4.4, "assets/diagram_teaching.png")
+    create_card(s6, 7.45, 2.1, 5.08, 4.4, "Strict Teaching Guardrails", "No Robotic Summaries",
+                "• Real analogies: Relates code ideas to everyday things (whiteboards, libraries, recipes).\n\n"
+                "• Conversational paragraphs: Talks naturally with 'you' and 'we' instead of cold bullet points.\n\n"
+                "• Clear definitions: Explains tricky terms the moment they appear.\n\n"
+                "• Zero copying: Never blindly copies paragraphs from the original page.")
+    add_footer(s6, 6, note="Explanation 5 of 8: Pedagogical Approach")
 
-    # --- SLIDE 7: Tech Stack ---
+    # --- SLIDE 7: EXPLANATION 6 — Who benefits? ---
     s7 = prs.slides.add_slide(blank_layout)
-    add_header(s7, "Implementation", "Minimalist, Zero-Overhead Tech Stack",
-               "Carefully curated dependencies prioritizing instant cold boots, zero database maintenance, and portable hosting.")
-    create_card(s7, 0.8, 2.3, 2.7, 4.1, "Frontend", "React 18",
-                "Component-driven reactive state, accessible forms, keyboard-navigable tabs, and responsive UI without heavyweight UI frameworks.")
-    create_card(s7, 3.81, 2.3, 2.7, 4.1, "Build Tool", "Vite 5",
-                "Sub-second HMR dev server and optimized production bundles under 60 KB compressed for instant browser execution.")
-    create_card(s7, 6.82, 2.3, 2.7, 4.1, "Serverless", "Node.js 20",
-                "Vercel serverless function execution handling secure API calls, timeout handling, and multi-branch raw GitHub streaming.")
-    create_card(s7, 9.83, 2.3, 2.7, 4.1, "Architecture", "Stateless",
-                "Pure stateless design. Zero database migrations, zero user data retention, and zero persistent infrastructure costs.")
-    add_footer(s7, 7)
+    add_header(s7, "Audience & Real-World Use", "Who Benefits From This Tool?",
+               "This tool bridges the communication gap between technical code and human understanding for people with different goals.")
+    create_card(s7, 0.8, 2.15, 3.65, 4.35, "Audience 01", "Coding Students & Beginners",
+                "When you're learning to code, reading big projects on GitHub is intimidating. This tool gives learners a gentle starting point and builds confidence.\n\n"
+                "Impact: Saves hours of confusion on day one.")
+    create_card(s7, 4.84, 2.15, 3.65, 4.35, "Audience 02", "Designers & Product Managers",
+                "Team members who don't write code can quickly understand what an engineering team is building, making collaboration easy and painless.\n\n"
+                "Impact: Bridges technical & creative teams.", blue_accent=True)
+    create_card(s7, 8.88, 2.15, 3.65, 4.35, "Audience 03", "Busy Professional Developers",
+                "Senior engineers evaluate dozens of code tools each week. Instead of spending 20 minutes reading through each one, they get the gist in 30 seconds.\n\n"
+                "Impact: Accelerates tool discovery 10x.")
+    add_footer(s7, 7, note="Explanation 6 of 8: Real-World Use Cases")
 
-    # --- SLIDE 8: Deployment & Ops ---
+    # --- SLIDE 8: EXPLANATION 7 — Clean, Fast, Private ---
     s8 = prs.slides.add_slide(blank_layout)
-    add_header(s8, "Operations & Deployment", "Zero-Config Deployment on Vercel",
-               "Deployable in under 60 seconds with simple declarative configuration and modular environment variable tiers.")
-    create_card(s8, 0.8, 2.3, 5.65, 4.1, "Configuration", "Plug-and-Play Environment Variables",
-                "Add as many or as few API keys as you prefer. The system automatically detects active keys and constructs the optimal fallback chain at runtime:\n\n"
-                "• GROK_API_KEY (xAI Grok Tier 1)\n"
-                "• GEMINI_API_KEY (Google Gemini Tier 2)\n"
-                "• DEEPSEEK_API_KEY (DeepSeek Tier 3)\n"
-                "• OPENROUTER_API_KEY (Free Model Tier 4)\n"
-                "• HUGGINGFACE_API_KEY (HF Inference Tier 5)")
-    create_card(s8, 6.88, 2.3, 5.65, 4.1, "Operational Profile", "Production Characteristics",
-                "• Global Edge Distribution: Frontend cached across Vercel's global CDN edges.\n\n"
-                "• Serverless Scalability: Instant elasticity from 0 to thousands of concurrent requests.\n\n"
-                "• Native Dev Parity: 'npm run dev' works out-of-the-box with local proxy support.\n\n"
-                "• Cost Effective: Operates completely within free tiers (Vercel Hobby + OpenRouter free models).")
-    add_footer(s8, 8)
+    add_header(s8, "Simple By Design", "Built Clean: Fast, Private, and Lightweight",
+               "We intentionally kept the software simple so it loads instantly on any phone or laptop without hidden complexities.")
+    create_card(s8, 0.8, 2.15, 5.65, 4.35, "Privacy First", "Zero Personal Data Stored",
+                "We do not collect personal information, passwords, or emails. We don't have a database tracking your searches. Once your explanation is finished, it disappears safely.\n\n"
+                "• No user logins or passwords required\n"
+                "• No cookies or advertising trackers\n"
+                "• Completely private and respectful")
+    create_card(s8, 6.88, 2.15, 5.65, 4.35, "Speed & Reliability", "Instant Loading Worldwide",
+                "Hosted across global cloud servers. Whether you're opening it from New York, London, or Tokyo, the page loads in the blink of an eye.\n\n"
+                "• Lightweight build (tiny file size under 60 KB)\n"
+                "• Runs smoothly on slow mobile connections\n"
+                "• Costs $0 to run using smart free tiers", blue_accent=True)
+    add_footer(s8, 8, note="Explanation 7 of 8: Design Principles")
 
-    # --- SLIDE 9: Roadmap ---
+    # --- SLIDE 9: EXPLANATION 8 — Future Roadmap ---
     s9 = prs.slides.add_slide(blank_layout)
-    add_header(s9, "Future Capabilities", "Platform Roadmap: Beyond READMEs",
-               "The foundation is laid for expanding into a comprehensive interactive repository exploration suite.")
-    create_card(s9, 0.8, 2.3, 3.65, 4.1, "Tab 2 · In Progress", "Architecture Flow Diagrams",
-                "Automated generation of visual Mermaid.js architectural diagrams illustrating component topologies, data flows, and external service contracts.", accent=True)
-    create_card(s9, 4.84, 2.3, 3.65, 4.1, "Tab 3 · Planned", "Repository Chatbot Q&A",
-                "Conversational assistant with contextual embeddings over repository documentation, enabling targeted inquiries like 'How do I configure auth?'.")
-    create_card(s9, 8.88, 2.3, 3.65, 4.1, "Tab 4 · Planned", "Interactive Code Explorer",
-                "In-browser file tree navigation with syntax highlighting and inline AI commentary for individual functions, classes, and config files.")
-    add_footer(s9, 9)
+    add_header(s9, "Looking Ahead", "What's Coming Next: The Future Roadmap",
+               "While today's tool is great at explaining code summaries, we have exciting visual and interactive features planned right inside the app.")
+    add_image_box(s9, 0.8, 2.1, 11.733, 4.4, "assets/diagram_roadmap.png")
+    add_footer(s9, 9, note="Explanation 8 of 8: Product Evolution")
 
-    # --- SLIDE 10: Conclusion ---
+    # --- SLIDE 10: CONCLUDING SLIDE (Slide 10 of 10) ---
     s10 = prs.slides.add_slide(blank_layout)
-    add_header(s10, "Conclusion", "Summary & Key Takeaways",
-               "A focused developer tool built with exceptional craft, pragmatic reliability, and clean execution.")
-    create_card(s10, 0.8, 2.3, 3.65, 4.1, "Value Delivered", "Immediate Comprehension",
-                "Cuts onboarding time for unfamiliar open-source codebases from hours to minutes through conversational synthesis.")
-    create_card(s10, 4.84, 2.3, 3.65, 4.1, "Architectural Strength", "Bulletproof Reliability",
-                "Five tiers of automated LLM failover ensure users are never greeted by broken screens or rate limit errors.")
-    create_card(s10, 8.88, 2.3, 3.65, 4.1, "Design Aesthetic", "Clean, Human-Centered",
-                "Built for focus: clean typography, white/soothing palette, responsive layout, and zero superfluous distraction.")
-    add_footer(s10, 10)
+    add_header(s10, "Summary & Closing", "Making Technology Understandable for Everyone",
+               "A quick recap of how GitHub Repo Explainer transforms confusing code into clear learning.")
+    create_card(s10, 0.8, 2.15, 3.65, 4.35, "Takeaway 1", "Instant Clarity",
+                "Turns intimidating software jargon into friendly, easy-to-read explanations with everyday analogies anyone can grasp.", blue_accent=True)
+    create_card(s10, 4.84, 2.15, 3.65, 4.35, "Takeaway 2", "Reliable by Design",
+                "A five-tier safety net guarantees the system is always responsive and ready to help, without annoying error screens.")
+    create_card(s10, 8.88, 2.15, 3.65, 4.35, "Takeaway 3", "Built for Everyone",
+                "Zero accounts, zero downloads, zero cost, and 100% private. Created to help curious people learn with confidence.", blue_accent=True)
+    add_footer(s10, 10, note="Concluding Summary")
 
     output_path = "presentation.pptx"
     prs.save(output_path)
-    print(f"Successfully generated {output_path}")
+    print(f"Generated {output_path} successfully with images and updated content.")
 
 if __name__ == '__main__':
     create_deck()

@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Repo Explainer — Project Overview</title>
+  <title>GitHub Repo Explainer — Project Presentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #fafbfc;
-      --card-bg: #ffffff;
-      --border: #e5e7eb;
-      --border-subtle: #f1f3f5;
-      --text-main: #111827;
-      --text-muted: #4b5563;
-      --text-soft: #6b7280;
-      --accent: #2563eb;
-      --accent-soft: #eff6ff;
-      --accent-line: #dbeafe;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --bg-white: #ffffff;
+      --bg-canvas: #f8fafc;
+      --surface: #ffffff;
+      --card-bg: #f9fafb;
+      --card-accent: #eff6ff;
+      --border: #e2e8f0;
+      --border-accent: #bfdbfe;
+      --text-main: #0f172a;
+      --text-muted: #334155;
+      --text-soft: #64748b;
+      --blue-primary: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-subtle: #dbeafe;
+      --blue-tag: #1e40af;
+      --green-tag: #065f46;
+      --green-bg: #d1fae5;
     }
 
     * {
@@ -31,80 +34,78 @@
     }
 
     body {
-      background: #f5f6f8;
+      background: var(--bg-canvas);
       color: var(--text-main);
-      font-family: var(--sans);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 20px 48px;
+      padding: 24px 16px 36px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Deck frame & controls */
     .deck-container {
       width: 100%;
-      max-width: 1060px;
+      max-width: 1080px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
+    /* Top bar */
     .deck-topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 4px;
+      padding: 6px 4px;
       color: var(--text-soft);
       font-size: 13px;
     }
 
-    .deck-title-badge {
-      display: flex;
+    .badge-live {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
       font-weight: 500;
       color: var(--text-muted);
-      letter-spacing: 0.02em;
     }
 
-    .deck-title-badge span.dot {
-      width: 6px;
-      height: 6px;
+    .badge-live .dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: #10b981;
+      background: var(--blue-primary);
     }
 
     .deck-nav-hints {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       font-size: 12px;
     }
 
     .key-hint {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 7px;
+      padding: 2px 6px;
       background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 4px;
-      font-family: var(--mono);
       font-size: 11px;
+      font-weight: 600;
       color: var(--text-muted);
     }
 
-    /* Slide Card */
+    /* Main Slide Card */
     .slide-viewport {
       position: relative;
-      background: var(--bg);
+      background: var(--bg-white);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
       aspect-ratio: 16 / 9.6;
-      min-height: 580px;
+      min-height: 590px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -113,13 +114,13 @@
     .slide {
       position: absolute;
       inset: 0;
-      padding: 56px 64px 44px;
+      padding: 44px 56px 36px;
       display: none;
       flex-direction: column;
       justify-content: space-between;
       opacity: 0;
-      transition: opacity 0.2s ease;
-      background: var(--bg);
+      transition: opacity 0.15s ease-in-out;
+      background: var(--bg-white);
     }
 
     .slide.active {
@@ -127,110 +128,81 @@
       opacity: 1;
     }
 
-    /* Slide Header */
+    /* Header styling */
     .slide-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue-primary);
+    }
+
+    .slide-title {
+      font-size: 27px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .slide-subtitle {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      font-weight: 400;
+      max-width: 920px;
+    }
+
+    /* Body */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      margin: 18px 0 10px;
+    }
+
+    /* Footer */
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    /* Card styling */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .slide-category {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-weight: 600;
-      color: var(--text-soft);
-    }
-
-    .slide-heading {
-      font-size: 30px;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-    }
-
-    .slide-subtitle {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      font-weight: 400;
-      max-width: 860px;
-    }
-
-    /* Slide Body */
-    .slide-body {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      margin: 24px 0 16px;
-    }
-
-    /* Slide Footer */
-    .slide-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 12px;
-      color: var(--text-soft);
-    }
-
-    .slide-footer-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .footer-divider {
-      color: var(--border);
-    }
-
-    /* Layout Grids */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      width: 100%;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      width: 100%;
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      width: 100%;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: all 0.15s ease;
-    }
-
-    .card.accent {
-      background: var(--accent-soft);
-      border-color: var(--accent-line);
+    .card.blue {
+      background: var(--card-accent);
+      border-color: var(--border-accent);
     }
 
     .card-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-soft);
+      letter-spacing: 0.06em;
+      color: var(--blue-primary);
     }
 
     .card-title {
@@ -246,153 +218,56 @@
       line-height: 1.55;
     }
 
-    /* Metrics / Callouts */
-    .metric-number {
-      font-size: 38px;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: -0.03em;
-      line-height: 1;
+    /* Layout Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      align-items: stretch;
     }
 
-    .metric-sub {
-      font-size: 12px;
-      color: var(--text-soft);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Step Sequence */
-    .flow-steps {
-      display: flex;
-      gap: 14px;
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
       width: 100%;
     }
 
-    .flow-step {
-      flex: 1;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
+    .grid-split {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      width: 100%;
+      align-items: center;
     }
 
-    .flow-step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #f1f3f5;
-      color: var(--text-main);
-      font-size: 12px;
-      font-weight: 600;
+    .grid-split-img-left {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      align-items: center;
+    }
+
+    /* Slide Images */
+    .slide-img-box {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* Code block preview */
-    .code-preview {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 14px 16px;
-      font-family: var(--mono);
-      font-size: 12.5px;
-      line-height: 1.6;
-      color: #334155;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-
-    /* Provider Tier List */
-    .tier-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .slide-img-box img {
       width: 100%;
-    }
-
-    .tier-row {
-      display: flex;
-      align-items: center;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px 18px;
-      gap: 16px;
-    }
-
-    .tier-rank {
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-soft);
-      width: 28px;
-    }
-
-    .tier-provider {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-main);
-      width: 150px;
-    }
-
-    .tier-models {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--text-muted);
-      flex: 1;
-    }
-
-    .tier-badge {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: #f1f3f5;
-      color: var(--text-muted);
-    }
-
-    .tier-badge.first {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .tier-badge.fallback {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    /* Comparison Table */
-    .compare-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-    }
-
-    .compare-table th {
-      text-align: left;
-      padding: 12px 16px;
-      border-bottom: 2px solid var(--border);
-      font-weight: 600;
-      color: var(--text-main);
-      background: #f9fafb;
-    }
-
-    .compare-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      vertical-align: top;
-    }
-
-    .compare-table tr:hover td {
-      background: #fafbfc;
+      height: auto;
+      display: block;
+      object-fit: contain;
     }
 
     /* Bottom Control Bar */
@@ -412,14 +287,14 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #d1d5db;
+      background: #cbd5e1;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .indicator-dot.active {
-      background: var(--text-main);
-      width: 24px;
+      background: var(--blue-primary);
+      width: 26px;
       border-radius: 10px;
     }
 
@@ -440,12 +315,24 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      text-decoration: none;
       transition: all 0.15s ease;
     }
 
     .btn:hover:not(:disabled) {
-      background: #f9fafb;
-      border-color: #d1d5db;
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-primary {
+      background: var(--blue-primary);
+      color: #ffffff;
+      border-color: var(--blue-primary);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--blue-hover);
+      border-color: var(--blue-hover);
     }
 
     .btn:disabled {
@@ -453,51 +340,29 @@
       cursor: not-allowed;
     }
 
-    .btn-primary {
-      background: #111827;
-      color: #ffffff;
-      border-color: #111827;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #1f2937;
-      border-color: #1f2937;
-    }
-
-    /* Clean typography accents */
-    .lead-quote {
-      font-size: 20px;
-      line-height: 1.5;
-      color: var(--text-main);
-      font-weight: 400;
-      border-left: 3px solid #111827;
-      padding-left: 20px;
-      margin: 12px 0;
-    }
-
-    ul.bullet-clean {
+    /* Clean bullet list */
+    ul.clean-list {
       list-style: none;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      margin-top: 4px;
     }
 
-    ul.bullet-clean li {
+    ul.clean-list li {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--text-muted);
       line-height: 1.5;
     }
 
-    ul.bullet-clean li::before {
-      content: "—";
-      color: var(--text-soft);
-      font-weight: 600;
+    ul.clean-list li .bullet {
+      color: var(--blue-primary);
+      font-weight: bold;
     }
 
-    /* Print / PDF view mode support */
     @media print {
       body {
         padding: 0;
@@ -526,483 +391,388 @@
   <div class="deck-container">
     <!-- Top Bar -->
     <header class="deck-topbar">
-      <div class="deck-title-badge">
+      <div class="badge-live">
         <span class="dot"></span>
-        <span>GitHub Repo Explainer</span>
-        <span style="color: var(--border);">|</span>
-        <span style="font-size: 12px; color: var(--text-soft);">Executive Overview</span>
+        <span style="font-weight: 600;">GitHub Repo Explainer</span>
+        <span style="color: var(--border);">/</span>
+        <span>A Friendly Guide to Understanding Any Code Project</span>
       </div>
       <div class="deck-nav-hints">
-        <span>Navigate: <span class="key-hint">←</span> <span class="key-hint">→</span> or <span class="key-hint">Space</span></span>
+        <span>Use keys: <span class="key-hint">←</span> <span class="key-hint">→</span> or <span class="key-hint">Space</span></span>
         <span style="color: var(--border);">|</span>
         <button id="fullscreen-btn" class="btn" style="padding: 3px 8px; font-size: 11px;">Full Screen</button>
       </div>
     </header>
 
-    <!-- Presentation Viewport -->
+    <!-- Main Presentation Window -->
     <main class="slide-viewport" id="viewport">
 
-      <!-- SLIDE 1: Title -->
+      <!-- ============================================== -->
+      <!-- SLIDE 1: INTRODUCTORY SLIDE (Slide 1 of 10)     -->
+      <!-- ============================================== -->
       <section class="slide active" data-slide="1">
         <div class="slide-header">
-          <div class="slide-category">Project Overview & Architecture</div>
-          <h1 class="slide-heading" style="font-size: 44px; margin-top: 12px;">GitHub Repo Explainer</h1>
-          <p class="slide-subtitle" style="font-size: 18px; margin-top: 8px;">
-            A resilient, zero-friction developer tool that translates complex open-source repositories into clear, mentor-style conceptual explanations.
+          <div class="slide-tag">Welcome & Introduction</div>
+          <h1 class="slide-title" style="font-size: 38px; margin-top: 6px;">GitHub Repo Explainer</h1>
+          <p class="slide-subtitle" style="font-size: 16px; margin-top: 6px;">
+            A simple, friendly tool that turns complicated computer code projects into clear, everyday English anyone can understand.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-3" style="margin-top: 10px;">
-            <div class="card">
-              <div class="card-label">Core Purpose</div>
-              <div class="card-title">Demystify Open Source</div>
-              <p class="card-desc">Paste any GitHub repository URL to receive an intuitive narrative breakdown without wading through dense jargon or inconsistent README files.</p>
+          <div class="grid-3" style="width: 100%;">
+            <div class="card blue">
+              <div class="card-label">What It Is</div>
+              <div class="card-title">A Helpful Guide for Curious People</div>
+              <p class="card-desc">Think of it like having an experienced, patient friend sitting next to you, explaining what a software project does without confusing words.</p>
             </div>
+
             <div class="card">
-              <div class="card-label">System Architecture</div>
-              <div class="card-title">5-Tier Resilient Fallback</div>
-              <p class="card-desc">Engineered for 99.9% uptime with cascading multi-provider AI redundancy across Grok, Gemini, DeepSeek, OpenRouter, and Hugging Face.</p>
+              <div class="card-label">How You Use It</div>
+              <div class="card-title">Just Paste a Link</div>
+              <p class="card-desc">No accounts to create, no software to download, and no coding knowledge needed. Just paste a link and press one button.</p>
             </div>
+
             <div class="card">
-              <div class="card-label">Stack & Delivery</div>
-              <div class="card-title">Modern Minimalist Web</div>
-              <p class="card-desc">Lightweight React + Vite single-page application powered by a Vercel Serverless Function backend with zero external database dependencies.</p>
+              <div class="card-label">Why It's Special</div>
+              <div class="card-title">Reliable & Always Ready</div>
+              <p class="card-desc">Backed by 5 smart helpers working behind the scenes. If one helper is busy or down, another steps in instantly so you never see an error.</p>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Author / Repository: agrwl-utkarsh/mini2</span>
-            <span class="footer-divider">/</span>
-            <span>Stack: React 18 · Vite · Vercel Functions</span>
-          </div>
-          <div>01 / 10</div>
+          <div>Introductory Overview · GitHub Repo Explainer</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 01 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 2: Problem Statement -->
+      <!-- ============================================== -->
+      <!-- SLIDE 2: EXPLANATION 1 — THE COMMON PROBLEM     -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="2">
         <div class="slide-header">
-          <div class="slide-category">The Problem</div>
-          <h2 class="slide-heading">The Friction of Navigating Open Source</h2>
+          <div class="slide-tag">The Problem We Solve</div>
+          <h2 class="slide-title">Why Looking at Code Projects is Frustrating</h2>
           <p class="slide-subtitle">
-            Developers spend hours deciphering open-source codebases before writing a single line of code.
+            Most software pages are written by technical experts for other experts, leaving students, beginners, and everyday team members completely lost.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-2">
-            <div class="card">
-              <div class="card-label">The Status Quo</div>
-              <div class="card-title">Why Traditional READMEs Fail Readers</div>
-              <ul class="bullet-clean" style="margin-top: 12px;">
-                <li><strong>Written for creators, not learners:</strong> READMEs assume extensive domain context, skipping high-level foundational mental models.</li>
-                <li><strong>Fragmented documentation:</strong> Critical explanations are often scattered across wikis, discussions, or omitted entirely.</li>
-                <li><strong>Boilerplate overload:</strong> Lengthy CLI commands, badge arrays, and license blocks obscure what the software actually solves.</li>
-                <li><strong>Intimidating to juniors:</strong> Cryptic architectural jargon discourages new developers and non-technical stakeholders.</li>
-              </ul>
+          <div class="grid-split-img-left">
+            <div class="slide-img-box">
+              <img src="assets/diagram_problem.png" alt="Comparison between confusing technical README and our clear conversational approach">
             </div>
 
-            <div class="card accent">
-              <div class="card-label">The Opportunity</div>
-              <div class="card-title">The Need for an Automated Senior Mentor</div>
-              <div class="lead-quote" style="margin-top: 14px;">
-                "Explain it like a senior engineer sitting right beside a junior developer during a 1-on-1 walkthrough."
-              </div>
-              <p class="card-desc" style="margin-top: 12px;">
-                Software needs a reliable translation layer: take raw repository technical documentation and distill it into intuitive concepts, practical analogies, and clear setup guidance.
-              </p>
+            <div class="card" style="height: 100%; justify-content: center;">
+              <div class="card-label">The Core Frustration</div>
+              <div class="card-title">Information Overload & Jargon</div>
+              <ul class="clean-list" style="margin-top: 12px;">
+                <li><span class="bullet">✕</span> <strong>Too much jargon:</strong> Words like "RPC", "middleware", and "WASM" with zero simple definitions.</li>
+                <li><span class="bullet">✕</span> <strong>Skips the big picture:</strong> Jumps straight into 50 installation commands without explaining what the app does.</li>
+                <li><span class="bullet">✕</span> <strong>Intimidating to read:</strong> Makes curious learners and non-technical stakeholders feel left out.</li>
+                <li><span class="bullet">✓</span> <strong>Our Solution:</strong> We strip away the noise and explain the project conceptually first.</li>
+              </ul>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Problem Domain: Developer Experience & Cognitive Load</span>
-          </div>
-          <div>02 / 10</div>
+          <div>Explanation 1 of 8 · The Problem: High Cognitive Barrier in Open Source</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 02 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 3: Value Proposition & Solution -->
+      <!-- ============================================== -->
+      <!-- SLIDE 3: EXPLANATION 2 — HOW TO USE IT (USER)  -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="3">
         <div class="slide-header">
-          <div class="slide-category">The Solution</div>
-          <h2 class="slide-heading">An Intelligent, Conversational Distillation Engine</h2>
+          <div class="slide-tag">How It Works For You</div>
+          <h2 class="slide-title">Three Effortless Steps: From Link to Understanding</h2>
           <p class="slide-subtitle">
-            A single entry point turning any repository link into an engaging, structured learning experience.
+            Anyone can use the tool in less than 10 seconds. You don't need any special skills or account sign-ups.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-3">
-            <div class="card">
-              <div class="card-label">Input Simplicity</div>
-              <div class="card-title">Zero Friction Entry</div>
-              <p class="card-desc">No accounts, no repo cloning, no local environment installation. Paste an HTTP link or select one-click presets (Next.js, React, Vite, Tailwind CSS).</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Pedagogical Design</div>
-              <div class="card-title">Mentor-Style Synthesis</div>
-              <p class="card-desc">Strict system prompt instructions forbid repetitive bullet points and verbatim copying. Produces 5–6 cohesive paragraphs centered around "Why", analogies, and real-world value.</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Graceful Resilience</div>
-              <div class="card-title">Never Shows a Broken Screen</div>
-              <p class="card-desc">Automated provider fallback prevents rate-limit lockouts. If all LLMs are unreachable, cleanly returns the sanitized README as an ultimate safety net.</p>
-            </div>
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/diagram_steps.png" alt="3 Simple Steps: Paste Link, AI Reads, Read Like a Story">
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>User Experience: Input URL → Fetch Source → Synthesize & Render</span>
-          </div>
-          <div>03 / 10</div>
+          <div>Explanation 2 of 8 · User Journey: Zero-Friction 3-Step Experience</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 03 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 4: Architecture Overview -->
+      <!-- ============================================== -->
+      <!-- SLIDE 4: EXPLANATION 3 — BEHIND THE SCENES      -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="4">
         <div class="slide-header">
-          <div class="slide-category">System Architecture</div>
-          <h2 class="slide-heading">End-to-End Execution Pipeline</h2>
+          <div class="slide-tag">Behind The Scenes</div>
+          <h2 class="slide-title">What Happens When You Click "Explain"</h2>
           <p class="slide-subtitle">
-            A lightweight, decoupled design optimizing for rapid response times and cold-start minimization.
+            A quick, quiet relay race takes place across four simple stations to deliver your friendly explanation in under two seconds.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="flow-steps">
-            <div class="flow-step">
-              <div class="flow-step-num">1</div>
-              <div class="card-title" style="font-size: 15px;">Client URL Input</div>
-              <p class="card-desc" style="font-size: 12.5px;">React interface parses user input, handles instant validation, and provides 1-click popular repository targets.</p>
-            </div>
-
-            <div class="flow-step">
-              <div class="flow-step-num">2</div>
-              <div class="card-title" style="font-size: 15px;">Serverless Proxy</div>
-              <p class="card-desc" style="font-size: 12.5px;">Vercel Function <code>/api/analyze</code> sanitizes input, extracts owner & repo names, and keeps API tokens secure server-side.</p>
-            </div>
-
-            <div class="flow-step">
-              <div class="flow-step-num">3</div>
-              <div class="card-title" style="font-size: 15px;">Multi-Branch Ingestion</div>
-              <p class="card-desc" style="font-size: 12.5px;">Fetches raw documentation across branches (<code>main</code>, <code>master</code>) and file variants (<code>.md</code>, <code>.txt</code>, <code>.rst</code>) via raw CDN.</p>
-            </div>
-
-            <div class="flow-step">
-              <div class="flow-step-num">4</div>
-              <div class="card-title" style="font-size: 15px;">Fallback LLM Pipeline</div>
-              <p class="card-desc" style="font-size: 12.5px;">Executes ordered provider calls with token truncation (8,000 chars) to prevent context blowup and excessive latency.</p>
-            </div>
-
-            <div class="flow-step">
-              <div class="flow-step-num">5</div>
-              <div class="card-title" style="font-size: 15px;">Tabular Presentation</div>
-              <p class="card-desc" style="font-size: 12.5px;">Client streams the mentor output into tabbed workspaces: Explanation, Architecture Flow, Chatbot Q&A, and Explorer.</p>
-            </div>
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/diagram_journey.png" alt="4 Step Flow: Browser to Server to Files to AI Mentor">
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Latency Budget: ~1.2s - 2.8s typical inference completion</span>
-          </div>
-          <div>04 / 10</div>
+          <div>Explanation 3 of 8 · System Journey: From Link Validation to Delivery</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 04 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 5: Multi-LLM Fallback Mechanism -->
+      <!-- ============================================== -->
+      <!-- SLIDE 5: EXPLANATION 4 — SAFETY NET & BACKUPS   -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="5">
         <div class="slide-header">
-          <div class="slide-category">Engineering Highlight</div>
-          <h2 class="slide-heading">The 5-Tier Fault-Tolerant LLM Matrix</h2>
+          <div class="slide-tag">Reliability Feature</div>
+          <h2 class="slide-title">Our 5-Tier Backup Team: Built to Never Break</h2>
           <p class="slide-subtitle">
-            Zero-downtime AI generation: if any provider encounters rate limits, timeouts, or quota drains, execution flows to the next provider instantly.
+            Online services sometimes go down or get overloaded. We built an automatic safety net so you will never see an empty error screen.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="tier-list">
-            <div class="tier-row">
-              <div class="tier-rank">01</div>
-              <div class="tier-provider">xAI Grok</div>
-              <div class="tier-models"><code>grok-beta</code> via <code>api.x.ai/v1</code></div>
-              <span class="tier-badge first">Primary Choice</span>
+          <div class="grid-split">
+            <div class="slide-img-box">
+              <img src="assets/diagram_backup.png" alt="5-Tier AI Backup Cascade">
             </div>
 
-            <div class="tier-row">
-              <div class="tier-rank">02</div>
-              <div class="tier-provider">Google Gemini</div>
-              <div class="tier-models"><code>gemini-1.5-flash</code> → <code>gemini-1.5-pro</code> → <code>gemini-1.0-pro</code></div>
-              <span class="tier-badge">Secondary Tier</span>
-            </div>
-
-            <div class="tier-row">
-              <div class="tier-rank">03</div>
-              <div class="tier-provider">DeepSeek</div>
-              <div class="tier-models"><code>deepseek-chat</code> via <code>api.deepseek.com/v1</code></div>
-              <span class="tier-badge">Cost Efficient</span>
-            </div>
-
-            <div class="tier-row">
-              <div class="tier-rank">04</div>
-              <div class="tier-provider">OpenRouter</div>
-              <div class="tier-models"><code>llama-3.2-3b</code>, <code>llama-3.2-1b</code>, <code>phi-3-mini</code>, <code>gemma-2-2b</code>, <code>qwen-2.5-7b</code></div>
-              <span class="tier-badge">Free Model Pool</span>
-            </div>
-
-            <div class="tier-row">
-              <div class="tier-rank">05</div>
-              <div class="tier-provider">Hugging Face</div>
-              <div class="tier-models"><code>Meta-Llama-3.1-8B-Instruct</code>, <code>Phi-3-mini-128k</code>, <code>gemma-2-2b-it</code></div>
-              <span class="tier-badge">Inference API</span>
-            </div>
-
-            <div class="tier-row" style="background: #fafbfc; border-style: dashed;">
-              <div class="tier-rank">06</div>
-              <div class="tier-provider">Raw README Fallback</div>
-              <div class="tier-models">Clean text excerpt (3,000 chars) + full transparent diagnostic trace</div>
-              <span class="tier-badge fallback">Safety Net</span>
+            <div class="card blue" style="height: 100%; justify-content: center;">
+              <div class="card-label">How Automatic Hand-off Works</div>
+              <div class="card-title">Like an Olympic Relay Team</div>
+              <p class="card-desc">
+                If our primary AI helper is busy, resting, or hits a rate limit, the request is handed to the next helper in a fraction of a second.
+              </p>
+              <ul class="clean-list" style="margin-top: 10px;">
+                <li><span class="bullet">•</span> <strong>Tier 1:</strong> Fast, conversational xAI Grok.</li>
+                <li><span class="bullet">•</span> <strong>Tiers 2 & 3:</strong> Google Gemini and DeepSeek.</li>
+                <li><span class="bullet">•</span> <strong>Tiers 4 & 5:</strong> Free community model networks.</li>
+                <li><span class="bullet">•</span> <strong>Ultimate Safety Net:</strong> Shows the clean text so you always get value.</li>
+              </ul>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Resilience: Survives API outages, individual key invalidity, and quota caps</span>
-          </div>
-          <div>05 / 10</div>
+          <div>Explanation 4 of 8 · Reliability: Multi-Provider Redundancy Matrix</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 05 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 6: Prompt Engineering -->
+      <!-- ============================================== -->
+      <!-- SLIDE 6: EXPLANATION 5 — THE TEACHING RECIPE     -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="6">
         <div class="slide-header">
-          <div class="slide-category">AI Quality & Pedagogy</div>
-          <h2 class="slide-heading">Prompt Engineering: The Mentor Persona</h2>
+          <div class="slide-tag">Quality & Tone</div>
+          <h2 class="slide-title">The Teaching Recipe: How We Keep It Friendly</h2>
           <p class="slide-subtitle">
-            Transforming raw text dumping into high-signal educational content through rigorous prompt constraints.
+            We don't just summarize; we teach. Strict rules make sure the response reads like a conversation, not a robotic manual.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-2">
-            <div class="card">
-              <div class="card-label">Pedagogical Framework</div>
-              <div class="card-title">Mandatory Narrative Structure</div>
-              <ul class="bullet-clean" style="margin-top: 10px;">
-                <li><strong>1. The Problem Space:</strong> Painting the before/after developer friction.</li>
-                <li><strong>2. Conceptual Architecture:</strong> "Think of it like..." everyday analogies.</li>
-                <li><strong>3. Core Capabilities:</strong> Pragmatic capabilities over feature checklists.</li>
-                <li><strong>4. First Steps:</strong> Gentle setup walkthrough from scratch.</li>
-                <li><strong>5. Jargon Dissection:</strong> On-the-fly definitions of key technical terms.</li>
-                <li><strong>6. Real-World Context:</strong> Identifying ideal use cases and project fits.</li>
-              </ul>
+          <div class="grid-split">
+            <div class="slide-img-box">
+              <img src="assets/diagram_teaching.png" alt="Teaching Recipe: Problem, Analogy, Use Cases, Quick Start">
             </div>
 
-            <div class="card" style="background: #fafbfc;">
-              <div class="card-label">Prompt Enforcement Rules</div>
-              <div class="card-title">Strict Output Guardrails</div>
-              <div class="code-preview" style="margin-top: 10px;">
-// Critical Prompt Rules:
-- DO NOT copy or quote README directly
-- DO NOT output section-by-section lists
-- Write ONLY in flowing, natural PARAGRAPHS
-- Conversational tone: use "you" and "we"
-- Avoid academic or robotic summaries
-- Minimum 5 to 6 cohesive paragraphs</div>
-              <p class="card-desc" style="margin-top: 10px; font-size: 13px;">
-                Guarantees human-like readability and eliminates low-value AI formatting tropes (bulleted spam, generic introductions).
-              </p>
+            <div class="card" style="height: 100%; justify-content: center;">
+              <div class="card-label">Strict Teaching Guardrails</div>
+              <div class="card-title">No Boring Robotic Summaries</div>
+              <ul class="clean-list" style="margin-top: 12px;">
+                <li><span class="bullet">✓</span> <strong>Real analogies:</strong> Relates code ideas to everyday things (whiteboards, libraries, recipes).</li>
+                <li><span class="bullet">✓</span> <strong>Conversational paragraphs:</strong> Talks naturally with "you" and "we" instead of cold textbook bullet points.</li>
+                <li><span class="bullet">✓</span> <strong>Clear definitions:</strong> Explains tricky terms the moment they appear.</li>
+                <li><span class="bullet">✕</span> <strong>Zero copying:</strong> Never blindly copies paragraphs from the original page.</li>
+              </ul>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Philosophy: Comprehension first, syntax second</span>
-          </div>
-          <div>06 / 10</div>
+          <div>Explanation 5 of 8 · Pedagogy: Emulating a 1-on-1 Mentorship Walkthrough</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 06 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 7: Technical Stack -->
+      <!-- ============================================== -->
+      <!-- SLIDE 7: EXPLANATION 6 — WHO USES THIS?         -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="7">
         <div class="slide-header">
-          <div class="slide-category">Implementation</div>
-          <h2 class="slide-heading">Minimalist, Zero-Overhead Tech Stack</h2>
+          <div class="slide-tag">Audience & Real-World Use</div>
+          <h2 class="slide-title">Who Benefits From This Tool?</h2>
           <p class="slide-subtitle">
-            Carefully curated dependencies prioritizing instant cold boots, zero database maintenance, and portable hosting.
+            This tool bridges the communication gap between technical code and human understanding for people with different goals.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-4">
+          <div class="grid-3" style="width: 100%;">
             <div class="card">
-              <div class="metric-number">React 18</div>
-              <div class="metric-sub">User Interface</div>
-              <p class="card-desc">Component-driven reactive state, accessible forms, keyboard-navigable tabs, and responsive UI.</p>
+              <div class="card-label">Audience 01</div>
+              <div class="card-title">Coding Students & Beginners</div>
+              <p class="card-desc">
+                When you're learning to code, reading big projects on GitHub is intimidating. This tool gives learners a gentle starting point and builds confidence.
+              </p>
+              <div style="margin-top: 8px; font-size: 12.5px; color: var(--blue-primary); font-weight: 600;">
+                Saves hours of confusion on day one
+              </div>
+            </div>
+
+            <div class="card blue">
+              <div class="card-label">Audience 02</div>
+              <div class="card-title">Designers & Product Managers</div>
+              <p class="card-desc">
+                Team members who don't write code can quickly understand what an engineering team is building, making collaboration easy and painless.
+              </p>
+              <div style="margin-top: 8px; font-size: 12.5px; color: var(--blue-primary); font-weight: 600;">
+                Bridges technical & creative teams
+              </div>
             </div>
 
             <div class="card">
-              <div class="metric-number">Vite 5</div>
-              <div class="metric-sub">Build System</div>
-              <p class="card-desc">Sub-second HMR dev server and optimized production assets under 60 KB compressed.</p>
-            </div>
-
-            <div class="card">
-              <div class="metric-number">Node 20</div>
-              <div class="metric-sub">Serverless Edge</div>
-              <p class="card-desc">Vercel serverless function execution handling secure API calls and streaming fetch operations.</p>
-            </div>
-
-            <div class="card">
-              <div class="metric-number">0 DB</div>
-              <div class="metric-sub">Stateless Design</div>
-              <p class="card-desc">Pure stateless architecture. No database migrations, user storage, or compliance liabilities.</p>
+              <div class="card-label">Audience 03</div>
+              <div class="card-title">Busy Professional Developers</div>
+              <p class="card-desc">
+                Senior engineers evaluate dozens of code tools each week. Instead of spending 20 minutes reading through each one, they get the gist in 30 seconds.
+              </p>
+              <div style="margin-top: 8px; font-size: 12.5px; color: var(--blue-primary); font-weight: 600;">
+                Accelerates tool discovery 10x
+              </div>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Production Bundle: Pure CSS + React + Native Fetch (no heavy external component kits)</span>
-          </div>
-          <div>07 / 10</div>
+          <div>Explanation 6 of 8 · Practical Value: High Impact Across Diverse User Groups</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 07 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 8: Deployment & Ops -->
+      <!-- ============================================== -->
+      <!-- SLIDE 8: EXPLANATION 7 — CLEAN & CAREFREE BUILD -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="8">
         <div class="slide-header">
-          <div class="slide-category">Operations & Deployment</div>
-          <h2 class="slide-heading">Zero-Config Deployment on Vercel</h2>
+          <div class="slide-tag">Simple By Design</div>
+          <h2 class="slide-title">Built Clean: Fast, Private, and Lightweight</h2>
           <p class="slide-subtitle">
-            Deployable in under 60 seconds with simple declarative configuration and modular environment variable tiers.
+            We intentionally kept the software simple so it loads instantly on any phone or laptop without hidden complexities.
           </p>
         </div>
 
         <div class="slide-body">
           <div class="grid-2">
             <div class="card">
-              <div class="card-label">Configuration Simplicity</div>
-              <div class="card-title">Plug-and-Play Environment Variables</div>
-              <p class="card-desc">Add as many or as few API keys as you prefer. The system automatically detects active keys and constructs the optimal fallback chain at runtime.</p>
-              <div class="code-preview" style="margin-top: 8px;">
-GROK_API_KEY=xai-...        # Tier 1 (xAI Grok)
-GEMINI_API_KEY=AIzaSy...    # Tier 2 (Google Gemini)
-DEEPSEEK_API_KEY=sk-...     # Tier 3 (DeepSeek)
-OPENROUTER_API_KEY=sk-or... # Tier 4 (Free models)
-HUGGINGFACE_API_KEY=hf_...  # Tier 5 (HF Inference)</div>
+              <div class="card-label">Privacy First</div>
+              <div class="card-title">Zero Personal Data Stored</div>
+              <p class="card-desc">
+                We do not collect personal information, passwords, or emails. We don't have a database tracking your searches. Once your explanation is finished, it disappears safely.
+              </p>
+              <ul class="clean-list" style="margin-top: 10px;">
+                <li><span class="bullet">•</span> No user logins or passwords required.</li>
+                <li><span class="bullet">•</span> No cookies or ads tracking you around the web.</li>
+                <li><span class="bullet">•</span> Completely private and respectful.</li>
+              </ul>
             </div>
 
-            <div class="card">
-              <div class="card-label">Operational Profile</div>
-              <div class="card-title">Deployment Characteristics</div>
-              <ul class="bullet-clean" style="margin-top: 10px;">
-                <li><strong>Global Edge Distribution:</strong> Frontend cached across Vercel's global CDN edges.</li>
-                <li><strong>Serverless Scalability:</strong> Instant elasticity from 0 to thousands of concurrent requests.</li>
-                <li><strong>Native Dev Parity:</strong> <code>npm run dev</code> works instantly with Vite proxy support.</li>
-                <li><strong>Cost Effective:</strong> Operates completely within free tiers (Vercel Hobby + OpenRouter free models).</li>
+            <div class="card blue">
+              <div class="card-label">Speed & Reliability</div>
+              <div class="card-title">Instant Loading Worldwide</div>
+              <p class="card-desc">
+                Hosted across global cloud servers (via Vercel). Whether you're opening it from New York, London, or Tokyo, the page loads in a blink of an eye.
+              </p>
+              <ul class="clean-list" style="margin-top: 10px;">
+                <li><span class="bullet">•</span> Lightweight build (tiny file size under 60 KB).</li>
+                <li><span class="bullet">•</span> Runs smoothly even on slow mobile connections.</li>
+                <li><span class="bullet">•</span> Costs $0 to run using smart free tiers.</li>
               </ul>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Deploy command: Push to main → Instant Vercel Git integration</span>
-          </div>
-          <div>08 / 10</div>
+          <div>Explanation 7 of 8 · Architecture: Privacy-Centric, Stateless, and Fast</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 08 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 9: Roadmap & Vision -->
+      <!-- ============================================== -->
+      <!-- SLIDE 9: EXPLANATION 8 — FUTURE ROADMAP         -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="9">
         <div class="slide-header">
-          <div class="slide-category">Future Capabilities</div>
-          <h2 class="slide-heading">Platform Roadmap: Beyond READMEs</h2>
+          <div class="slide-tag">Looking Ahead</div>
+          <h2 class="slide-title">What's Coming Next: The Future Roadmap</h2>
           <p class="slide-subtitle">
-            The foundation is laid for expanding into a comprehensive interactive repository exploration suite.
+            While today's tool is great at explaining code summaries, we have exciting visual and interactive features planned right inside the app.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-3">
-            <div class="card accent">
-              <div class="card-label">Tab 2 · In Progress</div>
-              <div class="card-title">Architecture Flow Diagrams</div>
-              <p class="card-desc">Automated generation of visual Mermaid.js architectural diagrams illustrating component topologies, data flows, and external service contracts.</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Tab 3 · Planned</div>
-              <div class="card-title">Repository Chatbot Q&A</div>
-              <p class="card-desc">Conversational assistant with contextual embeddings over repository documentation, enabling targeted inquiries like <em>"How do I configure auth?"</em>.</p>
-            </div>
-
-            <div class="card">
-              <div class="card-label">Tab 4 · Planned</div>
-              <div class="card-title">Interactive Code Explorer</div>
-              <p class="card-desc">In-browser file tree navigation with syntax highlighting and inline AI commentary for individual functions, classes, and config files.</p>
-            </div>
+          <div class="slide-img-box" style="width: 100%;">
+            <img src="assets/diagram_roadmap.png" alt="Future Roadmap: Current Explainer, Visual Flow, Chatbot, Code Explorer">
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Evolution: From documentation explainer to comprehensive codebase mentor</span>
-          </div>
-          <div>09 / 10</div>
+          <div>Explanation 8 of 8 · Product Evolution: Expanding into a Full Learning Hub</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 09 of 10</div>
         </footer>
       </section>
 
-      <!-- SLIDE 10: Conclusion & Summary -->
+      <!-- ============================================== -->
+      <!-- SLIDE 10: CONCLUDING SLIDE (Slide 10 of 10)     -->
+      <!-- ============================================== -->
       <section class="slide" data-slide="10">
         <div class="slide-header">
-          <div class="slide-category">Conclusion</div>
-          <h2 class="slide-heading">Summary & Key Takeaways</h2>
+          <div class="slide-tag">Summary & Closing</div>
+          <h2 class="slide-title">Making Technology Understandable for Everyone</h2>
           <p class="slide-subtitle">
-            A focused developer tool built with exceptional craft, pragmatic reliability, and clean execution.
+            A quick recap of how GitHub Repo Explainer transforms confusing code into clear learning.
           </p>
         </div>
 
         <div class="slide-body">
-          <div class="grid-3">
-            <div class="card">
-              <div class="card-label">Value Delivered</div>
-              <div class="card-title">Immediate Comprehension</div>
-              <p class="card-desc">Cuts onboarding time for unfamiliar open-source codebases from hours to minutes through conversational synthesis.</p>
+          <div class="grid-3" style="width: 100%;">
+            <div class="card blue">
+              <div class="card-label">Takeaway 1</div>
+              <div class="card-title">Instant Clarity</div>
+              <p class="card-desc">Turns intimidating software jargon into friendly, easy-to-read explanations with everyday analogies anyone can grasp.</p>
             </div>
 
             <div class="card">
-              <div class="card-label">Architectural Strength</div>
-              <div class="card-title">Bulletproof Reliability</div>
-              <p class="card-desc">Five tiers of automated LLM failover ensure users are never greeted by broken screens or rate limit errors.</p>
+              <div class="card-label">Takeaway 2</div>
+              <div class="card-title">Reliable by Design</div>
+              <p class="card-desc">A five-tier safety net guarantees the system is always responsive and ready to help, without annoying error screens.</p>
             </div>
 
-            <div class="card">
-              <div class="card-label">Design Aesthetic</div>
-              <div class="card-title">Clean, Human-Centered</div>
-              <p class="card-desc">Built for focus: clean typography, white/soothing palette, responsive layout, and zero superfluous distraction.</p>
+            <div class="card blue">
+              <div class="card-label">Takeaway 3</div>
+              <div class="card-title">Built for Everyone</div>
+              <p class="card-desc">Zero accounts, zero downloads, zero cost, and 100% private. Created to help curious people learn with confidence.</p>
             </div>
           </div>
         </div>
 
         <footer class="slide-footer">
-          <div class="slide-footer-left">
-            <span>Repository: github.com/agrwl-utkarsh/mini2</span>
-            <span class="footer-divider">/</span>
-            <span>Ready for production deployment</span>
-          </div>
-          <div>10 / 10</div>
+          <div>Thank You · Repository: github.com/agrwl-utkarsh/mini2</div>
+          <div style="font-weight: 600; color: var(--blue-primary);">Slide 10 of 10</div>
         </footer>
       </section>
 
@@ -1096,19 +866,15 @@ HUGGINGFACE_API_KEY=hf_...  # Tier 5 (HF Inference)</div>
       }
     });
 
-    // Fullscreen
     fullscreenBtn.addEventListener('click', () => {
       const elem = document.getElementById('viewport');
       if (!document.fullscreenElement) {
-        elem.requestFullscreen().catch(err => {
-          console.warn('Fullscreen error:', err);
-        });
+        elem.requestFullscreen().catch(err => console.warn(err));
       } else {
         document.exitFullscreen();
       }
     });
 
-    // Print
     printBtn.addEventListener('click', () => {
       window.print();
     });
