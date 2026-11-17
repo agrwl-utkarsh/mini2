@@ -510,7 +510,7 @@ body {
 
 /* Print */
 @media print {
-  .analyze-form, .examples, .footer, .submit-btn, .clear-btn, .example-btn {
+  .analyze-form, .examples, .submit-btn, .clear-btn, .example-btn {
     display: none !important;
   }
   .result {
