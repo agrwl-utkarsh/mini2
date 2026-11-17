@@ -16,6 +16,7 @@ npm run dev
 1. Push to GitHub
 2. Import in Vercel
 3. Add environment variables (add as many as you want — tried in order):
+   - `GROK_API_KEY` — from [console.x.ai](https://console.x.ai) **(tried first)**
    - `GEMINI_API_KEY` — from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
    - `DEEPSEEK_API_KEY` — from [platform.deepseek.com](https://platform.deepseek.com)
    - `OPENROUTER_API_KEY` — from [openrouter.ai/keys](https://openrouter.ai/keys) **(recommended — free models)**

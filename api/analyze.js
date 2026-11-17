@@ -78,7 +78,17 @@ Writing style:
 README to explain:
 ${readme}`
 
-  // 1. Try Gemini (correct model names for v1beta)
+  // 1. Try Grok (xAI) - if key exists
+  const grokKey = process.env.GROK_API_KEY
+  if (grokKey) {
+    try {
+      return await callGrok(prompt, grokKey)
+    } catch (err) {
+      console.warn('Grok failed:', err.message)
+    }
+  }
+
+  // 2. Try Gemini
   const geminiKey = process.env.GEMINI_API_KEY
   if (geminiKey) {
     const geminiModels = [
@@ -95,7 +105,7 @@ ${readme}`
     }
   }
 
-  // 2. Try DeepSeek
+  // 3. Try DeepSeek
   const deepseekKey = process.env.DEEPSEEK_API_KEY
   if (deepseekKey) {
     try {
@@ -105,7 +115,7 @@ ${readme}`
     }
   }
 
-  // 3. Try OpenRouter (current working free models)
+  // 4. Try OpenRouter
   const openRouterKey = process.env.OPENROUTER_API_KEY
   if (openRouterKey) {
     const openRouterModels = [
@@ -124,7 +134,7 @@ ${readme}`
     }
   }
 
-  // 4. Try Hugging Face Inference API (free)
+  // 5. Try Hugging Face
   const hfKey = process.env.HUGGINGFACE_API_KEY
   if (hfKey) {
     const hfModels = [
@@ -141,8 +151,35 @@ ${readme}`
     }
   }
 
-  // All providers failed - show clean raw README (no error dump)
+  // All providers failed
   return 'README content:\n\n' + readme.slice(0, 3000) + '\n\n(AI explanation unavailable - showing raw README)'
+}
+
+async function callGrok(prompt, apiKey) {
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'grok-beta',
+      messages: [
+        { role: 'system', content: 'You are a helpful teacher who explains code to beginners in simple language.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+    }),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text()
+    throw new Error(`Grok API error ${response.status}: ${errText}`)
+  }
+
+  const data = await response.json()
+  return data.choices?.[0]?.message?.content || 'No explanation generated'
 }
 
 async function callGemini(prompt, apiKey, model) {
