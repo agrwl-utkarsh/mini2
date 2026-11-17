@@ -10,7 +10,8 @@ export default async function handler(req, res) {
 
   let owner, repo
   try {
-    const parts = url.rtrim('/').split('/')
+    const cleanUrl = url.replace(/\/$/, '')
+    const parts = cleanUrl.split('/')
     owner = parts[parts.length - 2]
     repo = parts[parts.length - 1]
     if (!owner || !repo) throw new Error()
