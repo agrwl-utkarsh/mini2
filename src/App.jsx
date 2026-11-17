@@ -43,7 +43,6 @@ function App() {
   return (
     <div className="container">
       <header className="hero">
-        <div className="hero-badge">For Beginner Engineers</div>
         <h1>GitHub Repo Explainer</h1>
         <p className="subtitle">Paste any GitHub repository URL. Get a clear, beginner-friendly breakdown of what the project does, how it works, and how to use it — explained in plain English.</p>
       </header>
@@ -104,7 +103,6 @@ function App() {
         <article className="result" tabIndex="-1">
           <header className="result-header">
             <h2>Repository Breakdown</h2>
-            <span className="result-badge">AI Generated</span>
           </header>
           <div className="explanation">{explanation}</div>
         </article>

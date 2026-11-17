@@ -61,15 +61,11 @@ Keep it clear, friendly, and educational. Use simple language.
 README:
 ${readme}`
 
-  const errors = []
-
-  // 1. Try Gemini (multiple models)
+  // 1. Try Gemini (correct model names for v1beta)
   const geminiKey = process.env.GEMINI_API_KEY
   if (geminiKey) {
     const geminiModels = [
-      'gemini-1.5-flash-latest',
       'gemini-1.5-flash',
-      'gemini-1.5-pro-latest',
       'gemini-1.5-pro',
       'gemini-1.0-pro',
     ]
@@ -77,7 +73,6 @@ ${readme}`
       try {
         return await callGemini(prompt, geminiKey, model)
       } catch (err) {
-        errors.push(`Gemini (${model}): ${err.message}`)
         console.warn(`Gemini model ${model} failed:`, err.message)
       }
     }
@@ -89,25 +84,24 @@ ${readme}`
     try {
       return await callDeepSeek(prompt, deepseekKey)
     } catch (err) {
-      errors.push(`DeepSeek: ${err.message}`)
       console.warn('DeepSeek failed:', err.message)
     }
   }
 
-  // 3. Try OpenRouter (free models)
+  // 3. Try OpenRouter (current working free models)
   const openRouterKey = process.env.OPENROUTER_API_KEY
   if (openRouterKey) {
     const openRouterModels = [
-      'meta-llama/llama-3.1-8b-instruct:free',
-      'mistralai/mistral-7b-instruct:free',
-      'google/gemma-2-9b-it:free',
-      'meta-llama/llama-3.1-70b-instruct:free',
+      'meta-llama/llama-3.2-3b-instruct:free',
+      'meta-llama/llama-3.2-1b-instruct:free',
+      'microsoft/phi-3-mini-128k-instruct:free',
+      'google/gemma-2-2b-it:free',
+      'qwen/qwen-2.5-7b-instruct:free',
     ]
     for (const model of openRouterModels) {
       try {
         return await callOpenRouter(prompt, openRouterKey, model)
       } catch (err) {
-        errors.push(`OpenRouter (${model}): ${err.message}`)
         console.warn(`OpenRouter model ${model} failed:`, err.message)
       }
     }
@@ -118,25 +112,20 @@ ${readme}`
   if (hfKey) {
     const hfModels = [
       'meta-llama/Meta-Llama-3.1-8B-Instruct',
-      'mistralai/Mistral-7B-Instruct-v0.3',
-      'google/gemma-2-9b-it',
+      'microsoft/Phi-3-mini-128k-instruct',
+      'google/gemma-2-2b-it',
     ]
     for (const model of hfModels) {
       try {
         return await callHuggingFace(prompt, hfKey, model)
       } catch (err) {
-        errors.push(`HuggingFace (${model}): ${err.message}`)
         console.warn(`HuggingFace model ${model} failed:`, err.message)
       }
     }
   }
 
-  // All providers failed - show raw README with error summary
-  const errorSummary = errors.length > 0
-    ? `\n\n---\nAI providers unavailable:\n${errors.map(e => `• ${e}`).join('\n')}\nShowing raw README instead.`
-    : '\n\n(No AI API keys configured - showing raw README)'
-
-  return 'README content:\n\n' + readme.slice(0, 3000) + errorSummary
+  // All providers failed - show clean raw README (no error dump)
+  return 'README content:\n\n' + readme.slice(0, 3000) + '\n\n(AI explanation unavailable - showing raw README)'
 }
 
 async function callGemini(prompt, apiKey, model) {
@@ -236,6 +225,5 @@ async function callHuggingFace(prompt, apiKey, model) {
   }
 
   const data = await response.json()
-  // HF returns array of { generated_text: "..." }
   return data?.[0]?.generated_text || 'No explanation generated'
 }
