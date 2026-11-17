@@ -1,11 +1,31 @@
 import { useState } from 'react'
 import './App.css'
 
+const TABS = [
+  { id: 'explanation', label: 'AI Explanation', icon: '🧠' },
+  { id: 'architecture', label: 'Architecture Flow', icon: '📊' },
+  { id: 'chatbot', label: 'AI Chatbot Q&A', icon: '💬' },
+  { id: 'explorer', label: 'Code Explorer', icon: '🔍' },
+  { id: 'filetree', label: 'File Tree', icon: '📁' },
+  { id: 'depgraph', label: 'Dependency Graph', icon: '⚡' },
+  { id: 'coverage', label: 'Test Coverage', icon: '🧪' },
+]
+
+const PLACEHOLDERS = {
+  architecture: 'Architecture flow diagram will be generated here. This will show the high-level system architecture, data flow, and component interactions.',
+  chatbot: 'AI Chatbot Q&A interface will appear here. You\'ll be able to ask questions about the repository and get contextual answers.',
+  explorer: 'Code Explorer will appear here. Browse files, view code with syntax highlighting, and get AI explanations for specific functions or classes.',
+  filetree: 'File Tree Visualization will appear here. Interactive repository structure with folder/file navigation and quick stats.',
+  depgraph: 'Dependency Graph will appear here. Visual representation of package dependencies, import relationships, and module coupling.',
+  coverage: 'Test Coverage Insights will appear here. Coverage reports, uncovered lines, and test quality metrics.',
+}
+
 function App() {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [explanation, setExplanation] = useState(null)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('explanation')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -29,6 +49,7 @@ function App() {
 
       const data = await res.json()
       setExplanation(data.explanation)
+      setActiveTab('explanation')
     } catch (err) {
       setError(err.message || 'Something went wrong')
     } finally {
@@ -38,6 +59,27 @@ function App() {
 
   const handleExampleClick = (exampleUrl) => {
     setUrl(exampleUrl)
+  }
+
+  const renderTabContent = () => {
+    if (activeTab === 'explanation') {
+      return explanation ? (
+        <div className="explanation">{explanation}</div>
+      ) : (
+        <div className="empty-state">
+          <span className="empty-icon">🧠</span>
+          <p>Enter a GitHub repository URL and click "Explain This Repo" to get an AI-powered breakdown.</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="placeholder-content">
+        <span className="placeholder-icon">{TABS.find(t => t.id === activeTab)?.icon}</span>
+        <p>{PLACEHOLDERS[activeTab]}</p>
+        <span className="coming-soon">Coming Soon</span>
+      </div>
+    )
   }
 
   return (
@@ -99,51 +141,32 @@ function App() {
         </div>
       )}
 
-      {explanation && (
+      {explanation || activeTab !== 'explanation' ? (
         <article className="result" tabIndex="-1">
           <header className="result-header">
             <h2>Repository Breakdown</h2>
+            <div className="tab-bar" role="tablist" aria-label="Analysis views">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`panel-${tab.id}`}
+                  id={`tab-${tab.id}`}
+                  className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <span className="tab-icon">{tab.icon}</span>
+                  <span className="tab-label">{tab.label}</span>
+                </button>
+              ))}
+            </div>
           </header>
-          <div className="explanation">{explanation}</div>
+          <div className="tab-panels" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+            {renderTabContent()}
+          </div>
         </article>
-      )}
-
-      <section className="future-features" aria-label="Planned features">
-        <h3 className="future-title">Planned Features</h3>
-        <div className="future-grid">
-          <button type="button" className="future-btn" disabled>
-            <span className="future-icon">📊</span>
-            <span className="future-label">Architecture Flow Diagram</span>
-            <span className="future-badge">Planned</span>
-          </button>
-          <button type="button" className="future-btn" disabled>
-            <span className="future-icon">💬</span>
-            <span className="future-label">AI Chatbot Q&A</span>
-            <span className="future-badge">Planned</span>
-          </button>
-          <button type="button" className="future-btn" disabled>
-            <span className="future-icon">🔍</span>
-            <span className="future-label">Code Explorer</span>
-            <span className="future-badge">Planned</span>
-          </button>
-          <button type="button" className="future-btn" disabled>
-            <span className="future-icon">📁</span>
-            <span className="future-label">File Tree Visualization</span>
-            <span className="future-badge">Planned</span>
-          </button>
-          <button type="button" className="future-btn" disabled>
-            <span className="future-icon">⚡</span>
-            <span className="future-label">Dependency Graph</span>
-            <span className="future-badge">Planned</span>
-          </button>
-          <button type="button" className="future-btn" disabled>
-            <span className="future-icon">🧪</span>
-            <span className="future-label">Test Coverage Insights</span>
-            <span className="future-badge">Planned</span>
-          </button>
-        </div>
-        <p className="future-note">These features are in our roadmap for future development.</p>
-      </section>
+      ) : null}
     </div>
   )
 }
