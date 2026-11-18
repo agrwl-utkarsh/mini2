@@ -21,8 +21,11 @@ export default async function handler(req, res) {
 
   try {
     const repository = await fetchRepository(owner, repo)
-    const explanation = await explainRepository(repository)
-    return res.status(200).json({ explanation })
+    const [explanation, architecture] = await Promise.all([
+      explainRepository(repository),
+      generateArchitecture(repository)
+    ])
+    return res.status(200).json({ explanation, architecture })
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }
@@ -196,6 +199,165 @@ ${truncatedRepository}`
   // All providers failed - return debug info
   const debugInfo = `\n\n---\nDEBUG: Detected keys: ${detectedKeys.join(', ') || 'NONE'}\nErrors:\n${errors.map(e => `• ${e}`).join('\n') || '• No providers attempted (no keys detected)'}`
   return 'Repository content:\n\n' + repository.slice(0, 3000) + '\n\n(AI explanation unavailable' + debugInfo + ')'
+}
+
+async function generateArchitecture(repository) {
+  const maxLength = 6000
+  const truncated = repository.length > maxLength 
+    ? repository.slice(0, maxLength) + '\n\n[Content truncated...]'
+    : repository
+
+  const prompt = `Analyze this repository and generate a flowchart architecture diagram. Return ONLY a JSON object with "nodes" and "edges" arrays.
+
+Node types: "start", "process", "decision", "end", "database", "api", "service", "ui"
+Each node: { id, type, position: {x, y}, data: { label, description? } }
+Each edge: { id, source, target, label?, animated? }
+
+Rules:
+- 8-15 nodes max
+- Logical flow: start → processes → decisions → ends
+- Include: entry points, core services, data stores, external APIs, UI components
+- Position nodes in a top-down or left-right flow
+- Use x: 100-700, y: 50-500
+
+Example:
+{
+  "nodes": [
+    {"id": "1", "type": "start", "position": {"x": 400, "y": 50}, "data": {"label": "User Request"}},
+    {"id": "2", "type": "api", "position": {"x": 400, "y": 150}, "data": {"label": "API Gateway"}},
+    {"id": "3", "type": "service", "position": {"x": 200, "y": 250}, "data": {"label": "Auth Service"}},
+    {"id": "4", "type": "service", "position": {"x": 600, "y": 250}, "data": {"label": "Data Service"}},
+    {"id": "5", "type": "database", "position": {"x": 600, "y": 350}, "data": {"label": "Database"}},
+    {"id": "6", "type": "end", "position": {"x": 400, "y": 450}, "data": {"label": "Response"}}
+  ],
+  "edges": [
+    {"id": "e1", "source": "1", "target": "2"},
+    {"id": "e2", "source": "2", "target": "3"},
+    {"id": "e3", "source": "2", "target": "4"},
+    {"id": "e4", "source": "4", "target": "5"},
+    {"id": "e5", "source": "3", "target": "6"},
+    {"id": "e6", "source": "4", "target": "6"}
+  ]
+}
+
+Repository to analyze:
+${truncated}`
+
+  // Try to get architecture from any available provider
+  const providers = [
+    { key: 'GROK_API_KEY', caller: callGrok },
+    { key: 'GEMINI_API_KEY', caller: callGemini },
+    { key: 'DEEPSEEK_API_KEY', caller: callDeepSeek },
+    { key: 'OPENROUTER_API_KEY', caller: callOpenRouter },
+    { key: 'HUGGINGFACE_API_KEY', caller: callHuggingFace },
+  ]
+
+  for (const { key, caller } of providers) {
+    const apiKey = process.env[key]
+    if (!apiKey) continue
+    try {
+      const result = await caller(prompt, apiKey, key === 'GEMINI_API_KEY' ? 'gemini-1.5-flash-latest' : undefined)
+      const parsed = JSON.parse(result.replace(/```json|```/g, '').trim())
+      if (parsed.nodes && parsed.edges) return parsed
+    } catch (err) {
+      console.warn(`Architecture generation failed (${key}):`, err.message)
+    }
+  }
+
+  // Fallback: generate basic structure from repo name/keywords
+  return generateFallbackArchitecture(repository)
+}
+
+function generateFallbackArchitecture(repository) {
+  const lower = repository.toLowerCase()
+  const nodes = []
+  const edges = []
+  let nodeId = 1
+  let edgeId = 1
+
+  const addNode = (type, label, x, y, description) => {
+    nodes.push({ id: String(nodeId), type, position: { x, y }, data: { label, description } })
+    return nodeId++
+  }
+  const addEdge = (source, target, label) => {
+    edges.push({ id: `e${edgeId++}`, source: String(source), target: String(target), label })
+  }
+
+  const startId = addNode('start', 'Entry Point', 400, 50)
+  
+  // Detect common patterns
+  const hasApi = lower.includes('api') || lower.includes('rest') || lower.includes('graphql') || lower.includes('endpoint')
+  const hasAuth = lower.includes('auth') || lower.includes('login') || lower.includes('jwt') || lower.includes('oauth')
+  const hasDb = lower.includes('database') || lower.includes('db') || lower.includes('sql') || lower.includes('mongodb') || lower.includes('postgres') || lower.includes('redis')
+  const hasQueue = lower.includes('queue') || lower.includes('kafka') || lower.includes('rabbitmq') || lower.includes('message')
+  const hasCache = lower.includes('cache') || lower.includes('redis') || lower.includes('memcached')
+  const hasFrontend = lower.includes('react') || lower.includes('vue') || lower.includes('frontend') || lower.includes('ui') || lower.includes('component')
+  const hasWorker = lower.includes('worker') || lower.includes('background') || lower.includes('job') || lower.includes('cron')
+  const hasStorage = lower.includes('storage') || lower.includes('s3') || lower.includes('bucket') || lower.includes('file')
+  const hasML = lower.includes('ml') || lower.includes('model') || lower.includes('inference') || lower.includes('tensorflow') || lower.includes('pytorch')
+
+  let currentY = 150
+  const serviceIds = []
+
+  if (hasApi) {
+    const apiId = addNode('api', 'API Gateway', 400, currentY)
+    addEdge(startId, apiId)
+    serviceIds.push(apiId)
+    currentY += 100
+  } else {
+    serviceIds.push(startId)
+  }
+
+  // Core services
+  if (hasAuth) {
+    const authId = addNode('service', 'Auth Service', 200, currentY, 'Authentication & authorization')
+    serviceIds.forEach(s => addEdge(s, authId))
+    serviceIds.push(authId)
+  }
+
+  if (hasFrontend) {
+    const uiId = addNode('ui', 'Frontend/UI', 600, currentY, 'User interface components')
+    serviceIds.forEach(s => addEdge(s, uiId))
+    serviceIds.push(uiId)
+  }
+
+  // Data layer
+  if (hasDb) {
+    const dbId = addNode('database', 'Database', 400, currentY + 100, 'Primary data store')
+    serviceIds.forEach(s => addEdge(s, dbId))
+    serviceIds.push(dbId)
+  }
+
+  if (hasCache) {
+    const cacheId = addNode('database', 'Cache', 200, currentY + 100, 'Caching layer')
+    serviceIds.forEach(s => addEdge(s, cacheId))
+  }
+
+  if (hasQueue) {
+    const queueId = addNode('service', 'Message Queue', 600, currentY + 100, 'Async message processing')
+    serviceIds.forEach(s => addEdge(s, queueId))
+  }
+
+  if (hasStorage) {
+    const storageId = addNode('database', 'File Storage', 200, currentY + 200, 'Object/file storage')
+    serviceIds.forEach(s => addEdge(s, storageId))
+  }
+
+  if (hasWorker) {
+    const workerId = addNode('service', 'Background Workers', 600, currentY + 200, 'Async job processing')
+    serviceIds.forEach(s => addEdge(s, workerId))
+  }
+
+  if (hasML) {
+    const mlId = addNode('service', 'ML Inference', 400, currentY + 200, 'Model serving & inference')
+    serviceIds.forEach(s => addEdge(s, mlId))
+  }
+
+  // End node
+  const endId = addNode('end', 'Response/Output', 400, currentY + 300)
+  serviceIds.slice(-3).forEach(s => addEdge(s, endId))
+
+  return { nodes, edges }
 }
 
 async function callGrok(prompt, apiKey) {

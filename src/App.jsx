@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Flowchart from './Flowchart'
+import ArchitectureViewer from './ArchitectureViewer'
 import './App.css'
 
 const TABS = [
@@ -19,6 +20,7 @@ function App() {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [explanation, setExplanation] = useState(null)
+  const [architecture, setArchitecture] = useState(null)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('explanation')
 
@@ -29,6 +31,7 @@ function App() {
     setLoading(true)
     setError('')
     setExplanation(null)
+    setArchitecture(null)
 
     try {
       const res = await fetch('/api/analyze', {
@@ -44,6 +47,7 @@ function App() {
 
       const data = await res.json()
       setExplanation(data.explanation)
+      setArchitecture(data.architecture)
       setActiveTab('explanation')
     } catch (err) {
       setError(err.message || 'Something went wrong')
@@ -59,7 +63,15 @@ function App() {
   const renderTabContent = () => {
     if (activeTab === 'explanation') {
       return explanation ? (
-        <div className="explanation">{explanation}</div>
+        <div className="explanation">
+          {explanation}
+          {architecture && (
+            <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
+              <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', fontWeight: 600 }}>🏗 Architecture Flow</h3>
+              <ArchitectureViewer architecture={architecture} />
+            </div>
+          )}
+        </div>
       ) : (
         <div className="empty-state">
           <span className="empty-icon">🧠</span>
