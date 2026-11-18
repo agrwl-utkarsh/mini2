@@ -80,7 +80,7 @@ function Flowchart() {
   }, [setNodes, setEdges])
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Toolbar */}
       <div style={{ padding: '12px', borderBottom: '1px solid #eee', display: 'flex', gap: '8px', flexWrap: 'wrap', background: '#fafafa' }}>
         <button onClick={() => addNode('default')}>+ Add Node</button>
@@ -103,6 +103,7 @@ function Flowchart() {
         onConnect={onConnect}
         fitView
         attributionPosition="bottom-left"
+        style={{ flex: 1, width: '100%', height: '100%' }}
       >
         <Background color="#eee" gap={16} size={1} />
         <Controls />
