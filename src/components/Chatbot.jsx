@@ -7,7 +7,7 @@ const SUGGESTED_QUESTIONS = [
   'What are the core dependencies?',
 ]
 
-export default function Chatbot({ repoMeta, techStack, explanation, architecture, apiKeys }) {
+export default function Chatbot({ repoMeta, techStack, explanation, architecture, fileTree = [] }) {
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
@@ -49,10 +49,6 @@ You can ask about local setup, architectural design, specific files, or dependen
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKeys?.gemini && { 'x-gemini-key': apiKeys.gemini }),
-          ...(apiKeys?.grok && { 'x-grok-key': apiKeys.grok }),
-          ...(apiKeys?.openrouter && { 'x-openrouter-key': apiKeys.openrouter }),
-          ...(apiKeys?.deepseek && { 'x-deepseek-key': apiKeys.deepseek }),
         },
         body: JSON.stringify({
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
@@ -63,10 +59,11 @@ You can ask about local setup, architectural design, specific files, or dependen
             techStack,
             language: repoMeta?.language,
             htmlUrl: repoMeta?.htmlUrl,
-            readmeSnippet: explanation?.slice(0, 3000) || '',
+            readmeSnippet: explanation?.slice(0, 4000) || '',
             highlights: repoMeta?.highlights || [],
+            fileTree: fileTree.slice(0, 100),
+            architecture: architecture || {},
           },
-          apiKeys,
         }),
       })
 
@@ -89,7 +86,7 @@ You can ask about local setup, architectural design, specific files, or dependen
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: `Unable to get response: ${err.message}. Please check your connection or settings.`,
+          content: `Unable to get response: ${err.message}. Please check your connection.`,
           isError: true,
         },
       ])
@@ -139,23 +136,24 @@ You can ask about local setup, architectural design, specific files, or dependen
       return (
         <div key={index} className="chat-prose">
           {part.split('\n\n').map((para, pIdx) => {
-            if (!para.trim()) return null
-            if (para.startsWith('### ')) {
-              return <h4 key={pIdx} className="chat-heading">{para.replace('### ', '')}</h4>
+            const trimmed = para.trim()
+            if (!trimmed) return null
+            if (trimmed.startsWith('### ')) {
+              return <h4 key={pIdx} className="chat-heading">{trimmed.replace('### ', '')}</h4>
             }
-            if (para.startsWith('## ')) {
-              return <h3 key={pIdx} className="chat-heading">{para.replace('## ', '')}</h3>
+            if (trimmed.startsWith('## ')) {
+              return <h3 key={pIdx} className="chat-heading">{trimmed.replace('## ', '')}</h3>
             }
-            if (para.startsWith('- ') || para.startsWith('* ')) {
+            if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
               return (
                 <ul key={pIdx} className="chat-list">
-                  {para.split('\n').map((item, iIdx) => (
+                  {trimmed.split('\n').map((item, iIdx) => (
                     <li key={iIdx}>{item.replace(/^[-*]\s+/, '')}</li>
                   ))}
                 </ul>
               )
             }
-            return <p key={pIdx}>{para}</p>
+            return <p key={pIdx}>{trimmed}</p>
           })}
         </div>
       )

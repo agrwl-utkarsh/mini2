@@ -124,6 +124,7 @@ function App() {
             techStack={techStack}
             explanation={explanation}
             architecture={architecture}
+            fileTree={fileTree}
           />
         )
       case 'explorer':

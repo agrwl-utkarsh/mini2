@@ -110,14 +110,15 @@ const nodeTypes = {
 }
 
 export default function ArchitectureFlow({ architecture, repoMeta }) {
+  // Always build a clean, strictly vertical default layout
   const initialData = useMemo(() => {
     if (!architecture?.nodes || architecture.nodes.length === 0) {
       return {
         nodes: [
-          { id: '1', type: 'customNode', position: { x: 350, y: 50 }, data: { label: 'User Client', typeKey: 'start', tech: 'Browser', description: 'Starts requests' } },
-          { id: '2', type: 'customNode', position: { x: 350, y: 170 }, data: { label: 'API Gateway', typeKey: 'api', tech: 'Router', description: 'Directs traffic' } },
-          { id: '3', type: 'customNode', position: { x: 350, y: 290 }, data: { label: 'Application Logic', typeKey: 'service', tech: 'Core', description: 'Processes business rules' } },
-          { id: '4', type: 'customNode', position: { x: 350, y: 410 }, data: { label: 'Database', typeKey: 'database', tech: 'Storage', description: 'Saves records' } },
+          { id: '1', type: 'customNode', position: { x: 350, y: 40 }, data: { label: 'User Client', typeKey: 'start', tech: 'Browser', description: 'Starts requests', sourcePosition: Position.Bottom, targetPosition: Position.Top } },
+          { id: '2', type: 'customNode', position: { x: 350, y: 160 }, data: { label: 'API Gateway', typeKey: 'api', tech: 'Router', description: 'Directs traffic', sourcePosition: Position.Bottom, targetPosition: Position.Top } },
+          { id: '3', type: 'customNode', position: { x: 350, y: 280 }, data: { label: 'Application Logic', typeKey: 'service', tech: 'Core', description: 'Processes business rules', sourcePosition: Position.Bottom, targetPosition: Position.Top } },
+          { id: '4', type: 'customNode', position: { x: 350, y: 400 }, data: { label: 'Database', typeKey: 'database', tech: 'Storage', description: 'Saves records', sourcePosition: Position.Bottom, targetPosition: Position.Top } },
         ],
         edges: [
           { id: 'e1-2', source: '1', target: '2', label: 'Request', animated: true },
@@ -127,10 +128,11 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
       }
     }
 
+    // Position each node strictly in a vertical hierarchy by default
     const nodes = architecture.nodes.map((n, idx) => ({
       id: String(n.id || idx + 1),
       type: 'customNode',
-      position: n.position || { x: 260 + (idx % 2) * 220, y: 50 + Math.floor(idx / 2) * 120 },
+      position: { x: 350, y: 40 + idx * 125 },
       data: {
         label: n.data?.label || n.label || `Component ${idx + 1}`,
         typeKey: n.type || 'service',
@@ -192,10 +194,10 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
         let x, y
         if (isHoriz) {
           x = 60 + index * 240
-          y = 120 + ((index % 2) === 0 ? 0 : 120)
+          y = 150
         } else {
-          x = 340 + ((index % 2) === 0 ? -110 : 110)
-          y = 50 + index * 110
+          x = 350
+          y = 40 + index * 125
         }
 
         return {
@@ -219,28 +221,23 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     }))
   }, [nodes, filterType])
 
-  const handleReset = () => {
-    setNodes(initialData.nodes)
-    setEdges(initialData.edges)
-    setSelectedNode(null)
-  }
-
   const handleAddNode = (e) => {
     e.preventDefault()
     if (!newNodeForm.label.trim()) return
 
     const id = `node-${Date.now()}`
+    const isHoriz = layoutMode === 'horizontal'
     const newNode = {
       id,
       type: 'customNode',
-      position: { x: 350, y: 220 },
+      position: { x: isHoriz ? 60 + nodes.length * 240 : 350, y: isHoriz ? 150 : 40 + nodes.length * 125 },
       data: {
         label: newNodeForm.label.trim(),
         typeKey: newNodeForm.typeKey,
         tech: newNodeForm.tech.trim(),
         description: newNodeForm.description.trim(),
-        sourcePosition: layoutMode === 'horizontal' ? Position.Right : Position.Bottom,
-        targetPosition: layoutMode === 'horizontal' ? Position.Left : Position.Top,
+        sourcePosition: isHoriz ? Position.Right : Position.Bottom,
+        targetPosition: isHoriz ? Position.Left : Position.Top,
       }
     }
 
@@ -291,10 +288,6 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
             <option value="service">Core Services</option>
             <option value="database">Databases</option>
           </select>
-
-          <button type="button" className="btn-tool text-muted" onClick={handleReset} title="Reset layout">
-            Reset
-          </button>
         </div>
       </div>
 
