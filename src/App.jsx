@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Flowchart from './Flowchart'
 import './App.css'
 
 const TABS = [
@@ -65,6 +66,10 @@ function App() {
           <p>Enter a GitHub repository URL and click "Explain This Repo" to get an AI-powered breakdown.</p>
         </div>
       )
+    }
+
+    if (activeTab === 'architecture') {
+      return <div style={{ width: '100%', height: '600px' }}><Flowchart /></div>
     }
 
     return (
