@@ -14,21 +14,19 @@ import {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-// Professional Color Palette by Node Type
 const TYPE_CONFIG = {
-  start: { bg: '#ecfdf5', border: '#10b981', text: '#065f46', icon: '🚀', label: 'Client / Entry' },
-  ui: { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af', icon: '💻', label: 'Frontend / UI' },
-  api: { bg: '#f5f3ff', border: '#8b5cf6', text: '#5b21b6', icon: '⚡', label: 'API Gateway' },
-  service: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', icon: '⚙️', label: 'Core Service' },
-  decision: { bg: '#fff7ed', border: '#f97316', text: '#9a3412', icon: '🔀', label: 'Auth / Router' },
-  database: { bg: '#fce7f3', border: '#ec4899', text: '#9d174d', icon: '🗄️', label: 'Database' },
-  cache: { bg: '#e0e7ff', border: '#6366f1', text: '#3730a3', icon: '⚡', label: 'Cache Store' },
-  worker: { bg: '#f1f5f9', border: '#64748b', text: '#334155', icon: '🛠️', label: 'Queue / Worker' },
-  end: { bg: '#fef2f2', border: '#ef4444', text: '#991b1b', icon: '🎯', label: 'Output / Result' },
-  default: { bg: '#f8fafc', border: '#94a3b8', text: '#1e293b', icon: '📦', label: 'Component' },
+  start: { border: '#0ea5e9', bg: '#f0f9ff', tag: 'ENTRY', label: 'Client / Entry' },
+  ui: { border: '#3b82f6', bg: '#eff6ff', tag: 'UI', label: 'Frontend' },
+  api: { border: '#6366f1', bg: '#eef2ff', tag: 'API', label: 'API Gateway' },
+  service: { border: '#64748b', bg: '#f8fafc', tag: 'SERVICE', label: 'Core Service' },
+  decision: { border: '#f59e0b', bg: '#fffbeb', tag: 'ROUTER', label: 'Router' },
+  database: { border: '#059669', bg: '#ecfdf5', tag: 'DATA', label: 'Database' },
+  cache: { border: '#0284c7', bg: '#f0f9ff', tag: 'CACHE', label: 'Cache' },
+  worker: { border: '#475569', bg: '#f1f5f9', tag: 'WORKER', label: 'Worker' },
+  end: { border: '#10b981', bg: '#f0fdf4', tag: 'OUTPUT', label: 'Response' },
+  default: { border: '#94a3b8', bg: '#f8fafc', tag: 'MODULE', label: 'Component' },
 }
 
-// Custom Node Component with proper Handles and rich typography
 function CustomArchitectureNode({ data, selected }) {
   const typeKey = data.typeKey || 'default'
   const config = TYPE_CONFIG[typeKey] || TYPE_CONFIG.default
@@ -36,17 +34,17 @@ function CustomArchitectureNode({ data, selected }) {
   return (
     <div
       style={{
-        padding: '12px 16px',
-        borderRadius: '10px',
-        background: config.bg,
-        border: `2px solid ${selected ? '#2563eb' : config.border}`,
-        boxShadow: selected ? '0 0 0 4px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(0,0,0,0.08)' : '0 2px 6px rgba(0,0,0,0.04)',
-        minWidth: '170px',
+        padding: '12px 14px',
+        borderRadius: '8px',
+        background: 'var(--color-surface)',
+        border: `1.5px solid ${selected ? 'var(--color-accent)' : 'var(--color-border)'}`,
+        boxShadow: selected ? '0 0 0 3px var(--color-accent-light), var(--shadow-sm)' : 'var(--shadow-sm)',
+        minWidth: '180px',
         maxWidth: '240px',
-        fontFamily: 'Inter, -apple-system, sans-serif',
+        fontFamily: 'inherit',
         position: 'relative',
-        transition: 'all 0.15s ease',
         cursor: 'pointer',
+        transition: 'border-color 0.15s ease',
       }}
     >
       <Handle
@@ -54,54 +52,41 @@ function CustomArchitectureNode({ data, selected }) {
         position={data.targetPosition || Position.Top}
         style={{
           background: config.border,
-          width: 9,
-          height: 9,
-          border: '2px solid #fff',
+          width: 8,
+          height: 8,
+          border: '2px solid var(--color-surface)',
         }}
       />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '16px', lineHeight: 1 }}>{config.icon}</span>
         <span
           style={{
-            fontSize: '10px',
-            textTransform: 'uppercase',
+            fontSize: '9px',
+            fontFamily: 'var(--font-mono)',
             fontWeight: 700,
-            letterSpacing: '0.04em',
-            padding: '2px 6px',
+            letterSpacing: '0.06em',
+            padding: '2px 5px',
             borderRadius: '4px',
-            background: 'rgba(0,0,0,0.06)',
-            color: config.text,
+            background: config.bg,
+            color: config.border,
+            border: `1px solid ${config.border}33`,
           }}
         >
-          {config.label}
+          {config.tag}
         </span>
+        {data.tech && (
+          <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            {data.tech}
+          </span>
+        )}
       </div>
 
-      <div style={{ fontWeight: 600, fontSize: '13px', color: '#0f172a', marginBottom: '4px' }}>
+      <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--color-text)', marginBottom: '3px' }}>
         {data.label}
       </div>
 
-      {data.tech && (
-        <div
-          style={{
-            display: 'inline-block',
-            fontSize: '11px',
-            fontWeight: 500,
-            padding: '1px 6px',
-            borderRadius: '12px',
-            background: '#ffffff',
-            border: '1px solid rgba(0,0,0,0.1)',
-            color: '#475569',
-            marginBottom: '4px',
-          }}
-        >
-          {data.tech}
-        </div>
-      )}
-
       {data.description && (
-        <div style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.4, marginTop: '2px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
           {data.description}
         </div>
       )}
@@ -111,9 +96,9 @@ function CustomArchitectureNode({ data, selected }) {
         position={data.sourcePosition || Position.Bottom}
         style={{
           background: config.border,
-          width: 9,
-          height: 9,
-          border: '2px solid #fff',
+          width: 8,
+          height: 8,
+          border: '2px solid var(--color-surface)',
         }}
       />
     </div>
@@ -125,18 +110,17 @@ const nodeTypes = {
 }
 
 export default function ArchitectureFlow({ architecture, repoMeta }) {
-  // Normalize nodes & edges with fallback
   const initialData = useMemo(() => {
     if (!architecture?.nodes || architecture.nodes.length === 0) {
       return {
         nodes: [
-          { id: '1', type: 'customNode', position: { x: 350, y: 50 }, data: { label: 'User Client', typeKey: 'start', tech: 'Browser / CLI', description: 'Entry point for requests' } },
-          { id: '2', type: 'customNode', position: { x: 350, y: 180 }, data: { label: 'API Gateway', typeKey: 'api', tech: 'Router', description: 'Routes and authorizes requests' } },
-          { id: '3', type: 'customNode', position: { x: 350, y: 310 }, data: { label: 'Core Engine', typeKey: 'service', tech: 'App Logic', description: 'Business processing' } },
-          { id: '4', type: 'customNode', position: { x: 350, y: 440 }, data: { label: 'Persistence', typeKey: 'database', tech: 'Storage', description: 'Database records' } },
+          { id: '1', type: 'customNode', position: { x: 350, y: 50 }, data: { label: 'User Client', typeKey: 'start', tech: 'Browser', description: 'Starts requests' } },
+          { id: '2', type: 'customNode', position: { x: 350, y: 170 }, data: { label: 'API Gateway', typeKey: 'api', tech: 'Router', description: 'Directs traffic' } },
+          { id: '3', type: 'customNode', position: { x: 350, y: 290 }, data: { label: 'Application Logic', typeKey: 'service', tech: 'Core', description: 'Processes business rules' } },
+          { id: '4', type: 'customNode', position: { x: 350, y: 410 }, data: { label: 'Database', typeKey: 'database', tech: 'Storage', description: 'Saves records' } },
         ],
         edges: [
-          { id: 'e1-2', source: '1', target: '2', label: 'HTTP / Call', animated: true },
+          { id: 'e1-2', source: '1', target: '2', label: 'Request', animated: true },
           { id: 'e2-3', source: '2', target: '3', label: 'Dispatches', animated: true },
           { id: 'e3-4', source: '3', target: '4', label: 'Queries', animated: true },
         ],
@@ -146,9 +130,9 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     const nodes = architecture.nodes.map((n, idx) => ({
       id: String(n.id || idx + 1),
       type: 'customNode',
-      position: n.position || { x: 250 + (idx % 3) * 200, y: 50 + Math.floor(idx / 3) * 140 },
+      position: n.position || { x: 260 + (idx % 2) * 220, y: 50 + Math.floor(idx / 2) * 120 },
       data: {
-        label: n.data?.label || n.label || `Node ${idx + 1}`,
+        label: n.data?.label || n.label || `Component ${idx + 1}`,
         typeKey: n.type || 'service',
         tech: n.data?.tech || n.tech || '',
         description: n.data?.description || n.description || '',
@@ -164,8 +148,8 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
       label: e.label || '',
       animated: e.animated ?? true,
       type: 'smoothstep',
-      markerEnd: { type: MarkerType.ArrowClosed, color: '#64748b' },
-      style: { stroke: '#94a3b8', strokeWidth: 2 },
+      markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--color-border-hover)' },
+      style: { stroke: 'var(--color-border-hover)', strokeWidth: 1.5 },
     }))
 
     return { nodes, edges }
@@ -176,12 +160,9 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
   const [selectedNode, setSelectedNode] = useState(null)
   const [layoutMode, setLayoutMode] = useState('vertical')
   const [filterType, setFilterType] = useState('all')
-  const [showMermaidModal, setShowMermaidModal] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [newNodeForm, setNewNodeForm] = useState({ label: '', typeKey: 'service', tech: '', description: '' })
-  const [copyStatus, setCopyStatus] = useState('')
 
-  // Update when architecture prop changes
   useEffect(() => {
     setNodes(initialData.nodes)
     setEdges(initialData.edges)
@@ -192,8 +173,8 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
       ...params,
       type: 'smoothstep',
       animated: true,
-      markerEnd: { type: MarkerType.ArrowClosed, color: '#64748b' },
-      style: { stroke: '#94a3b8', strokeWidth: 2 }
+      markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--color-border-hover)' },
+      style: { stroke: 'var(--color-border-hover)', strokeWidth: 1.5 }
     }, eds)),
     [setEdges]
   )
@@ -202,7 +183,6 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     setSelectedNode(node)
   }, [])
 
-  // Auto Layout switch (Vertical vs Horizontal)
   const applyLayout = (direction) => {
     setLayoutMode(direction)
     const isHoriz = direction === 'horizontal'
@@ -211,10 +191,10 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
       return currentNodes.map((node, index) => {
         let x, y
         if (isHoriz) {
-          x = 80 + index * 220
-          y = 120 + ((index % 2) === 0 ? 0 : 140)
+          x = 60 + index * 240
+          y = 120 + ((index % 2) === 0 ? 0 : 120)
         } else {
-          x = 350 + ((index % 2) === 0 ? -120 : 120)
+          x = 340 + ((index % 2) === 0 ? -110 : 110)
           y = 50 + index * 110
         }
 
@@ -231,7 +211,6 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     })
   }
 
-  // Filter nodes by category
   const visibleNodes = useMemo(() => {
     if (filterType === 'all') return nodes
     return nodes.map(n => ({
@@ -240,14 +219,12 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     }))
   }, [nodes, filterType])
 
-  // Reset to AI architecture
   const handleReset = () => {
     setNodes(initialData.nodes)
     setEdges(initialData.edges)
     setSelectedNode(null)
   }
 
-  // Add custom node
   const handleAddNode = (e) => {
     e.preventDefault()
     if (!newNodeForm.label.trim()) return
@@ -256,7 +233,7 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     const newNode = {
       id,
       type: 'customNode',
-      position: { x: 350 + Math.floor(Math.random() * 80), y: 200 + Math.floor(Math.random() * 80) },
+      position: { x: 350, y: 220 },
       data: {
         label: newNodeForm.label.trim(),
         typeKey: newNodeForm.typeKey,
@@ -272,61 +249,10 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
     setNewNodeForm({ label: '', typeKey: 'service', tech: '', description: '' })
   }
 
-  // Delete selected node
   const handleDeleteNode = (idToDelete) => {
     setNodes((nds) => nds.filter((n) => n.id !== idToDelete))
     setEdges((eds) => eds.filter((e) => e.source !== idToDelete && e.target !== idToDelete))
     if (selectedNode?.id === idToDelete) setSelectedNode(null)
-  }
-
-  // Export JSON
-  const handleExportJson = () => {
-    const payload = {
-      repository: repoMeta?.fullName || 'repository',
-      generatedAt: new Date().toISOString(),
-      nodes: nodes.map(n => ({
-        id: n.id,
-        type: n.data.typeKey,
-        label: n.data.label,
-        tech: n.data.tech,
-        description: n.data.description,
-        position: n.position
-      })),
-      edges: edges.map(e => ({
-        id: e.id,
-        source: e.source,
-        target: e.target,
-        label: e.label
-      }))
-    }
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${repoMeta?.repo || 'architecture'}-flow.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  // Generate Mermaid Diagram
-  const mermaidCode = useMemo(() => {
-    let code = 'graph TD\n'
-    nodes.forEach(n => {
-      const label = (n.data.label || n.id).replace(/["()]/g, '')
-      const tech = n.data.tech ? ` [${n.data.tech}]` : ''
-      code += `  ${n.id}["${label}${tech}"]\n`
-    })
-    edges.forEach(e => {
-      const label = e.label ? `|${e.label}|` : ''
-      code += `  ${e.source} -->${label} ${e.target}\n`
-    })
-    return code
-  }, [nodes, edges])
-
-  const copyMermaid = () => {
-    navigator.clipboard.writeText(mermaidCode)
-    setCopyStatus('Copied Mermaid Code!')
-    setTimeout(() => setCopyStatus(''), 2500)
   }
 
   return (
@@ -341,17 +267,15 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
             type="button"
             className={`btn-tool ${layoutMode === 'vertical' ? 'active' : ''}`}
             onClick={() => applyLayout('vertical')}
-            title="Vertical Flow (Top-to-Bottom)"
           >
-            ⬇ Vertical
+            Vertical
           </button>
           <button
             type="button"
             className={`btn-tool ${layoutMode === 'horizontal' ? 'active' : ''}`}
             onClick={() => applyLayout('horizontal')}
-            title="Horizontal Flow (Left-to-Right)"
           >
-            ➡ Horizontal
+            Horizontal
           </button>
         </div>
 
@@ -360,30 +284,21 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
             className="filter-select"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            aria-label="Filter components by category"
           >
-            <option value="all">Filter: All Components</option>
-            <option value="ui">Frontend / UI</option>
+            <option value="all">All Components</option>
+            <option value="ui">Frontend</option>
             <option value="api">API Gateways</option>
             <option value="service">Core Services</option>
             <option value="database">Databases</option>
-            <option value="cache">Caches</option>
-            <option value="worker">Workers / Queues</option>
           </select>
 
-          <button type="button" className="btn-tool" onClick={() => setShowMermaidModal(true)}>
-            📊 Mermaid Code
-          </button>
-          <button type="button" className="btn-tool" onClick={handleExportJson}>
-            💾 Export JSON
-          </button>
-          <button type="button" className="btn-tool text-danger" onClick={handleReset} title="Reset to original AI diagram">
-            ↺ Reset
+          <button type="button" className="btn-tool text-muted" onClick={handleReset} title="Reset layout">
+            Reset
           </button>
         </div>
       </div>
 
-      {/* Main Flow Canvas */}
+      {/* Main Canvas */}
       <div className="flow-canvas-wrapper">
         <ReactFlow
           nodes={visibleNodes}
@@ -397,41 +312,35 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
           fitViewOptions={{ padding: 0.2 }}
           attributionPosition="bottom-left"
         >
-          <Background color="#cbd5e1" gap={18} size={1} />
+          <Background color="var(--color-border)" gap={20} size={1} />
           <Controls />
           <MiniMap
             nodeColor={(node) => {
               const type = node.data?.typeKey
               return TYPE_CONFIG[type]?.border || '#94a3b8'
             }}
-            nodeBorderRadius={4}
-            maskColor="rgba(241, 245, 249, 0.7)"
+            nodeBorderRadius={2}
+            maskColor="rgba(0, 0, 0, 0.05)"
           />
 
           <Panel position="top-right" className="flow-badge-panel">
-            <span>{nodes.length} Components</span>
-            <span>{edges.length} Connections</span>
+            <span>{nodes.length} nodes</span>
+            <span>{edges.length} connections</span>
           </Panel>
         </ReactFlow>
 
         {/* Selected Node Details Drawer */}
         {selectedNode && (
-          <aside className="node-inspector" aria-label="Component Inspector">
+          <aside className="node-inspector">
             <div className="inspector-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '20px' }}>
-                  {TYPE_CONFIG[selectedNode.data.typeKey]?.icon || '📦'}
-                </span>
-                <div>
-                  <h4>{selectedNode.data.label}</h4>
-                  <span className="badge-type">{TYPE_CONFIG[selectedNode.data.typeKey]?.label}</span>
-                </div>
+              <div>
+                <h4>{selectedNode.data.label}</h4>
+                <span className="badge-type">{TYPE_CONFIG[selectedNode.data.typeKey]?.label}</span>
               </div>
               <button
                 type="button"
                 className="close-btn"
                 onClick={() => setSelectedNode(null)}
-                aria-label="Close inspector"
               >
                 ✕
               </button>
@@ -440,32 +349,32 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
             <div className="inspector-body">
               {selectedNode.data.tech && (
                 <div className="inspector-field">
-                  <label>Technology / Framework</label>
-                  <p className="tech-badge-large">{selectedNode.data.tech}</p>
+                  <label>Technology</label>
+                  <p className="tech-badge-plain">{selectedNode.data.tech}</p>
                 </div>
               )}
 
               <div className="inspector-field">
-                <label>Description & Role</label>
-                <p>{selectedNode.data.description || 'No specific role description provided for this node.'}</p>
+                <label>Description</label>
+                <p>{selectedNode.data.description || 'No description provided.'}</p>
               </div>
 
               <div className="inspector-field">
-                <label>Connected Connections</label>
+                <label>Connections</label>
                 <div className="connections-list">
                   <div>
-                    <strong>Inputs from:</strong>{' '}
+                    <strong>Inputs:</strong>{' '}
                     {edges
                       .filter(e => e.target === selectedNode.id)
                       .map(e => nodes.find(n => n.id === e.source)?.data.label || e.source)
-                      .join(', ') || 'None (Ingress entry point)'}
+                      .join(', ') || 'None (Initial entry)'}
                   </div>
                   <div style={{ marginTop: '4px' }}>
-                    <strong>Outputs to:</strong>{' '}
+                    <strong>Outputs:</strong>{' '}
                     {edges
                       .filter(e => e.source === selectedNode.id)
                       .map(e => nodes.find(n => n.id === e.target)?.data.label || e.target)
-                      .join(', ') || 'None (Terminal node)'}
+                      .join(', ') || 'None (Final output)'}
                   </div>
                 </div>
               </div>
@@ -476,7 +385,7 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
                   className="btn-danger-outline"
                   onClick={() => handleDeleteNode(selectedNode.id)}
                 >
-                  🗑 Remove Component
+                  Remove Component
                 </button>
               </div>
             </div>
@@ -484,9 +393,9 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
         )}
       </div>
 
-      {/* Legend Footer */}
+      {/* Minimal Legend Footer */}
       <footer className="flow-legend">
-        <strong>Component Types:</strong>
+        <span className="legend-title">Legend:</span>
         {Object.entries(TYPE_CONFIG)
           .filter(([k]) => k !== 'default')
           .map(([key, item]) => (
@@ -495,7 +404,7 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
                 className="legend-color-dot"
                 style={{ background: item.bg, borderColor: item.border }}
               ></span>
-              {item.icon} {item.label}
+              {item.label}
             </span>
           ))}
       </footer>
@@ -510,11 +419,11 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
             </div>
             <form onSubmit={handleAddNode} className="modal-form">
               <div className="form-group">
-                <label>Component Name *</label>
+                <label>Component Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Stripe Payment Handler"
+                  placeholder="e.g. Authentication Handler"
                   value={newNodeForm.label}
                   onChange={(e) => setNewNodeForm({ ...newNodeForm, label: e.target.value })}
                   autoFocus
@@ -527,14 +436,12 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
                   value={newNodeForm.typeKey}
                   onChange={(e) => setNewNodeForm({ ...newNodeForm, typeKey: e.target.value })}
                 >
-                  <option value="ui">Frontend / UI</option>
-                  <option value="api">API Gateway / Router</option>
+                  <option value="ui">Frontend</option>
+                  <option value="api">API Gateway</option>
                   <option value="service">Core Service</option>
-                  <option value="decision">Auth / Security / Decision</option>
-                  <option value="database">Database / Persistence</option>
-                  <option value="cache">Cache Store</option>
-                  <option value="worker">Background Queue / Worker</option>
-                  <option value="end">Output / Response</option>
+                  <option value="database">Database</option>
+                  <option value="cache">Cache</option>
+                  <option value="worker">Worker</option>
                 </select>
               </div>
 
@@ -542,7 +449,7 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
                 <label>Technology (optional)</label>
                 <input
                   type="text"
-                  placeholder="e.g. PostgreSQL, Redis, Express, Docker"
+                  placeholder="e.g. PostgreSQL, Redis, Node.js"
                   value={newNodeForm.tech}
                   onChange={(e) => setNewNodeForm({ ...newNodeForm, tech: e.target.value })}
                 />
@@ -552,7 +459,7 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
                 <label>Description (optional)</label>
                 <textarea
                   rows={2}
-                  placeholder="Explain its responsibility within the project..."
+                  placeholder="What this component handles..."
                   value={newNodeForm.description}
                   onChange={(e) => setNewNodeForm({ ...newNodeForm, description: e.target.value })}
                 />
@@ -567,33 +474,6 @@ export default function ArchitectureFlow({ architecture, repoMeta }) {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Mermaid Export Modal */}
-      {showMermaidModal && (
-        <div className="modal-backdrop" onClick={() => setShowMermaidModal(false)}>
-          <div className="modal-card wide" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Mermaid Markdown Diagram</h3>
-              <button type="button" className="close-btn" onClick={() => setShowMermaidModal(false)}>✕</button>
-            </div>
-            <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>
-              Paste this directly into your GitHub README.md in a <code>```mermaid</code> block to display this architecture natively on GitHub!
-            </p>
-            <pre className="mermaid-code-block">
-              <code>{mermaidCode}</code>
-            </pre>
-            <div className="modal-actions">
-              {copyStatus && <span className="copy-feedback">{copyStatus}</span>}
-              <button type="button" className="btn-secondary" onClick={() => setShowMermaidModal(false)}>
-                Close
-              </button>
-              <button type="button" className="btn-primary" onClick={copyMermaid}>
-                📋 Copy Mermaid Syntax
-              </button>
-            </div>
           </div>
         </div>
       )}

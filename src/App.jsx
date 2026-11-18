@@ -3,14 +3,13 @@ import ArchitectureFlow from './components/ArchitectureFlow'
 import Chatbot from './components/Chatbot'
 import CodeExplorer from './components/CodeExplorer'
 import CodeExplanation from './components/CodeExplanation'
-import SettingsModal from './components/SettingsModal'
 import './App.css'
 
 const TABS = [
-  { id: 'explanation', label: '📖 Code Explanation', icon: '📖' },
-  { id: 'architecture', label: '🏗 Architecture Flow', icon: '🏗' },
-  { id: 'chatbot', label: '🤖 AI Chatbot Q&A', icon: '🤖' },
-  { id: 'explorer', label: '📁 Code Explorer', icon: '📁' },
+  { id: 'explanation', label: 'Explanation' },
+  { id: 'architecture', label: 'Architecture' },
+  { id: 'chatbot', label: 'Chat' },
+  { id: 'explorer', label: 'Files' },
 ]
 
 const EXAMPLE_REPOS = [
@@ -27,7 +26,6 @@ function App() {
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('explanation')
   
-  // Analyzed repository data
   const [repoMeta, setRepoMeta] = useState(null)
   const [explanation, setExplanation] = useState(null)
   const [highlights, setHighlights] = useState([])
@@ -35,51 +33,17 @@ function App() {
   const [architecture, setArchitecture] = useState(null)
   const [fileTree, setFileTree] = useState([])
 
-  // User Preferences & Settings
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [apiKeys, setApiKeys] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('repo_explainer_keys') || '{}')
-    } catch {
-      return {}
-    }
-  })
-  const [recentRepos, setRecentRepos] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('repo_explainer_recents') || '[]')
-    } catch {
-      return []
-    }
-  })
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('repo_explainer_theme') || 'light'
   })
 
-  // Sync theme
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('repo_explainer_theme', theme)
   }, [theme])
 
-  // Sync API keys
-  const handleSaveKeys = (keys) => {
-    setApiKeys(keys)
-    localStorage.setItem('repo_explainer_keys', JSON.stringify(keys))
-  }
-
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light')
-  }
-
-  const hasConfiguredKeys = Object.values(apiKeys).some(k => Boolean(k?.trim()))
-
-  const saveRecentRepo = (urlToSave, name) => {
-    setRecentRepos(prev => {
-      const filtered = prev.filter(r => r.url !== urlToSave)
-      const updated = [{ url: urlToSave, name }, ...filtered].slice(0, 5)
-      localStorage.setItem('repo_explainer_recents', JSON.stringify(updated))
-      return updated
-    })
   }
 
   const handleSubmit = async (e) => {
@@ -97,16 +61,9 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKeys?.gemini && { 'x-gemini-key': apiKeys.gemini }),
-          ...(apiKeys?.grok && { 'x-grok-key': apiKeys.grok }),
-          ...(apiKeys?.openrouter && { 'x-openrouter-key': apiKeys.openrouter }),
-          ...(apiKeys?.deepseek && { 'x-deepseek-key': apiKeys.deepseek }),
-          ...(apiKeys?.huggingface && { 'x-huggingface-key': apiKeys.huggingface }),
-          ...(apiKeys?.github && { 'x-github-token': apiKeys.github }),
         },
         body: JSON.stringify({
           url: url.trim(),
-          apiKeys,
         }),
       })
 
@@ -123,8 +80,6 @@ function App() {
       setArchitecture(data.architecture)
       setFileTree(data.fileTree || [])
       setActiveTab('explanation')
-
-      saveRecentRepo(url.trim(), data.meta?.fullName || url.trim())
     } catch (err) {
       setError(err.message || 'Something went wrong while analyzing the repository.')
     } finally {
@@ -140,8 +95,7 @@ function App() {
     if (!repoMeta && !explanation && !loading) {
       return (
         <div className="empty-state">
-          <span className="empty-icon">🧠</span>
-          <p>Enter any GitHub repository URL above and click <strong>"Explain This Repo"</strong> to generate an architectural breakdown, interactive flowchart, AI Q&A bot, and code explorer.</p>
+          <p>Enter a GitHub repository URL above and click <strong>Explain Repository</strong>.</p>
         </div>
       )
     }
@@ -170,7 +124,6 @@ function App() {
             techStack={techStack}
             explanation={explanation}
             architecture={architecture}
-            apiKeys={apiKeys}
           />
         )
       case 'explorer':
@@ -178,7 +131,6 @@ function App() {
           <CodeExplorer
             repoMeta={repoMeta}
             fileTree={fileTree}
-            apiKeys={apiKeys}
           />
         )
       default:
@@ -188,54 +140,40 @@ function App() {
 
   return (
     <div className="app-layout">
-      {/* Navigation Topbar */}
+      {/* Topbar */}
       <header className="topbar">
         <div className="topbar-inner">
           <div className="topbar-brand">
-            <span className="brand-logo">⚡</span>
-            <span className="brand-title">GitHub Repo Explainer</span>
+            <span className="brand-title">Repository Explainer</span>
           </div>
 
           <div className="topbar-actions">
             <button
               type="button"
               className="btn-topbar"
-              onClick={() => setIsSettingsOpen(true)}
-              title="Configure API Keys"
-            >
-              ⚙️ API Keys
-              {hasConfiguredKeys && <span className="active-dot" title="Custom keys active"></span>}
-            </button>
-
-            <button
-              type="button"
-              className="btn-topbar theme-toggle"
               onClick={toggleTheme}
-              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-              aria-label="Toggle theme"
             >
-              {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
             </button>
 
             <a
               href="https://github.com/agrwl-utkarsh/mini2"
               target="_blank"
               rel="noreferrer"
-              className="btn-topbar github-link"
-              title="View on GitHub"
+              className="btn-topbar"
             >
-              ⭐ GitHub
+              GitHub
             </a>
           </div>
         </div>
       </header>
 
       <main className="container">
-        {/* Hero Section */}
+        {/* Minimal Hero */}
         <section className="hero">
-          <h1>Understand Any GitHub Repository</h1>
+          <h1>GitHub Repository Explainer</h1>
           <p className="subtitle">
-            Paste any GitHub repository URL. Get a senior engineer explanation, interactive architecture flowcharts, a context-aware AI chatbot, and a deep file tree code explorer.
+            Understand any codebase in plain, simple English. Inspect system architecture, chat about the code, and browse repository files.
           </p>
         </section>
 
@@ -268,17 +206,17 @@ function App() {
             {loading ? (
               <>
                 <span className="spinner" aria-hidden="true"></span>
-                <span>Analyzing Architecture...</span>
+                <span>Analyzing...</span>
               </>
             ) : (
-              'Explain This Repo 🚀'
+              'Explain Repository'
             )}
           </button>
         </form>
 
-        {/* Quick Example Repositories */}
-        <div className="examples" aria-label="Example repositories">
-          <span className="examples-label">Try an example:</span>
+        {/* Example repositories */}
+        <div className="examples">
+          <span className="examples-label">Examples:</span>
           {EXAMPLE_REPOS.map((ex) => (
             <button
               key={ex.url}
@@ -292,45 +230,20 @@ function App() {
           ))}
         </div>
 
-        {/* Recent Repositories */}
-        {recentRepos.length > 0 && (
-          <div className="recents-row">
-            <span className="recents-label">Recent Searches:</span>
-            {recentRepos.map((r) => (
-              <button
-                key={r.url}
-                type="button"
-                className="recent-chip"
-                onClick={() => handleSelectExample(r.url)}
-                disabled={loading}
-              >
-                🕒 {r.name}
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Error notification */}
         {error && (
           <div className="error" role="alert">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="2"/>
-              <path d="M10 6v6M10 14h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
             <span>{error}</span>
           </div>
         )}
 
-        {/* Main Content Area */}
+        {/* Results */}
         {(repoMeta || explanation || loading) && (
-          <article className="result" tabIndex="-1">
+          <article className="result">
             {/* Repository Info Header Card */}
             {repoMeta && (
               <header className="repo-info-banner">
                 <div className="repo-identity">
-                  {repoMeta.avatarUrl && (
-                    <img src={repoMeta.avatarUrl} alt="" className="owner-avatar" />
-                  )}
                   <div>
                     <h2 className="repo-name">
                       <a href={repoMeta.htmlUrl} target="_blank" rel="noreferrer">
@@ -344,16 +257,16 @@ function App() {
                 </div>
 
                 <div className="repo-stats-pills">
-                  <span className="stat-pill" title="GitHub Stars">⭐ {repoMeta.stars.toLocaleString()}</span>
-                  <span className="stat-pill" title="GitHub Forks">🍴 {repoMeta.forks.toLocaleString()}</span>
-                  <span className="stat-pill" title="Primary Language">🏷️ {repoMeta.language}</span>
-                  <span className="stat-pill" title="License">⚖️ {repoMeta.license}</span>
+                  <span className="stat-pill">{repoMeta.stars.toLocaleString()} stars</span>
+                  <span className="stat-pill">{repoMeta.forks.toLocaleString()} forks</span>
+                  <span className="stat-pill">{repoMeta.language}</span>
+                  <span className="stat-pill">{repoMeta.license}</span>
                 </div>
               </header>
             )}
 
             {/* Tab Navigation */}
-            <div className="tab-bar" role="tablist" aria-label="Analysis tool views">
+            <div className="tab-bar" role="tablist">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -381,14 +294,6 @@ function App() {
           </article>
         )}
       </main>
-
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        apiKeys={apiKeys}
-        onSave={handleSaveKeys}
-      />
     </div>
   )
 }

@@ -13,37 +13,34 @@ export default async function handler(req, res) {
   const repoName = repoContext.name || 'this repository'
   const techStack = Array.isArray(repoContext.techStack) 
     ? repoContext.techStack.map(t => t.name || t).join(', ') 
-    : (repoContext.techStack || 'Standard software stack')
+    : (repoContext.techStack || 'Standard web stack')
 
   const keys = {
     grok: apiKeys.grok || req.headers['x-grok-key'] || process.env.GROK_API_KEY,
     gemini: apiKeys.gemini || req.headers['x-gemini-key'] || process.env.GEMINI_API_KEY,
     deepseek: apiKeys.deepseek || req.headers['x-deepseek-key'] || process.env.DEEPSEEK_API_KEY,
     openrouter: apiKeys.openrouter || req.headers['x-openrouter-key'] || process.env.OPENROUTER_API_KEY,
-    huggingface: apiKeys.huggingface || req.headers['x-huggingface-key'] || process.env.HUGGINGFACE_API_KEY,
   }
 
-  const systemPrompt = `You are an expert Senior Staff Software Engineer and architect mentoring a developer about the repository "${repoName}".
-Repository Description: ${repoContext.description || 'Open source software'}
-Detected Tech Stack: ${techStack}
-Key Highlights:
-${(repoContext.highlights || []).map(h => `- ${h}`).join('\n')}
+  const systemPrompt = `You are a helpful software engineer answering questions about the repository "${repoName}".
+Description: ${repoContext.description || 'Open source software'}
+Tech Stack: ${techStack}
 
-README Excerpt:
-${(repoContext.readmeSnippet || '').slice(0, 4000)}
+README:
+${(repoContext.readmeSnippet || '').slice(0, 3500)}
 
-Instructions:
-- Provide clear, direct, and actionable answers.
-- Use code blocks with language indicators when showing code or commands.
-- If the question asks about architecture, setup, dependencies, or debugging, give concrete guidance based on this repository.
-- Keep tone professional, encouraging, and technically precise.`
+Guidelines:
+- Explain things in clear, plain English that is easy to understand.
+- Avoid unnecessary jargon or corporate buzzwords.
+- Keep answers practical, focused, and direct.
+- Do not use childish emojis.
+- Provide clean code snippets when demonstrating commands or functions.`
 
   const conversation = messages.map(m => ({
     role: m.role === 'user' ? 'user' : 'assistant',
     content: m.content
   }))
 
-  // 1. Try Grok
   if (keys.grok) {
     try {
       const reply = await chatWithGrok(systemPrompt, conversation, keys.grok)
@@ -53,20 +50,18 @@ Instructions:
     }
   }
 
-  // 2. Try Gemini
   if (keys.gemini) {
-    const geminiModels = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash-exp']
+    const geminiModels = ['gemini-1.5-flash-latest', 'gemini-1.5-flash']
     for (const model of geminiModels) {
       try {
         const reply = await chatWithGemini(systemPrompt, conversation, keys.gemini, model)
-        return res.status(200).json({ message: reply, provider: `Gemini (${model})` })
+        return res.status(200).json({ message: reply, provider: 'Gemini' })
       } catch (e) {
-        console.warn(`Chat Gemini ${model} failed:`, e.message)
+        console.warn(`Chat Gemini failed:`, e.message)
       }
     }
   }
 
-  // 3. Try DeepSeek
   if (keys.deepseek) {
     try {
       const reply = await chatWithDeepSeek(systemPrompt, conversation, keys.deepseek)
@@ -76,7 +71,6 @@ Instructions:
     }
   }
 
-  // 4. Try OpenRouter
   if (keys.openrouter) {
     try {
       const reply = await chatWithOpenRouter(systemPrompt, conversation, keys.openrouter)
@@ -86,94 +80,70 @@ Instructions:
     }
   }
 
-  // Intelligent Contextual Fallback
-  const fallbackReply = generateFallbackChatReply(userQuestion, repoContext)
+  const fallbackReply = generateCleanFallbackReply(userQuestion, repoContext)
   return res.status(200).json({
     message: fallbackReply,
-    provider: 'Built-in Repository Intelligence (Offline)'
+    provider: 'Assistant'
   })
 }
 
-function generateFallbackChatReply(question, context) {
+function generateCleanFallbackReply(question, context) {
   const q = question.toLowerCase()
   const name = context.name || 'this repository'
-  const tech = Array.isArray(context.techStack) ? context.techStack.map(t => t.name).join(', ') : 'modern tech'
-  const readme = (context.readmeSnippet || '').toLowerCase()
+  const tech = Array.isArray(context.techStack) ? context.techStack.map(t => t.name).join(', ') : 'standard web tools'
 
   if (q.includes('run') || q.includes('start') || q.includes('install') || q.includes('setup')) {
-    return `### How to Run & Set Up **${name}**
+    return `### How to Run ${name} Locally
 
-1. **Clone the repository:**
+1. Clone the repository:
 \`\`\`bash
 git clone ${context.htmlUrl || `https://github.com/${name}`}.git
-cd ${context.repo || 'repo'}
+cd ${context.repo || 'repository'}
 \`\`\`
 
-2. **Install dependencies:**
+2. Install dependencies:
 \`\`\`bash
-npm install # or pip install -r requirements.txt / cargo build
+npm install
 \`\`\`
 
-3. **Configure environment:**
-Check for an \`.env.example\` or configuration file in the root directory. Copy it to \`.env\` and supply required keys.
-
-4. **Launch development server:**
+3. Start the development server:
 \`\`\`bash
 npm run dev
 \`\`\`
-Check the **Code Explorer** tab for specific configuration scripts and entry points!`
+
+Make sure you have Node.js installed on your computer before running these commands.`
   }
 
   if (q.includes('tech') || q.includes('stack') || q.includes('language') || q.includes('framework')) {
-    return `### Tech Stack Overview for **${name}**
+    return `### Technologies Used in ${name}
 
-This project utilizes:
-- **Core Technologies:** ${tech}
-- **Primary Language:** ${context.language || 'JavaScript/TypeScript'}
-- **Architecture Style:** Component-driven, modular layered architecture.
+- Primary Language: ${context.language || 'JavaScript/TypeScript'}
+- Detected Stack: ${tech}
+- Architecture: Modular component-based structure
 
-You can inspect the interactive component diagram in the **Architecture Flow** tab to see how these technologies interface!`
+You can explore the Architecture tab to see how these parts connect to each other.`
   }
 
-  if (q.includes('architecture') || q.includes('flow') || q.includes('how it works') || q.includes('design')) {
-    return `### Architecture & Data Flow in **${name}**
+  if (q.includes('architecture') || q.includes('flow') || q.includes('how it works')) {
+    return `### How ${name} Is Structured
 
-- **Entry Point & Presentation:** Handles client requests, user inputs, and routing.
-- **Service & Domain Layer:** Orchestrates business logic, transforms payloads, and enforces application rules.
-- **Persistence & External Integrations:** Interfaces with databases, cloud APIs, and storage subsystems.
+1. User Interface: Handles user input and displays visual screens.
+2. API & Routing: Validates incoming requests and routes them to the right handler.
+3. Core Logic: Runs the application logic and processes information.
+4. Data Storage: Saves and retrieves records from the database or storage layer.
 
-Switch to the **Architecture Flow** tab to interactively explore, drag, and customize the node-by-node architecture diagram!`
+Switch to the Architecture tab to view the visual layout.`
   }
 
-  if (q.includes('test') || q.includes('test runner')) {
-    return `### Running Tests for **${name}**
+  return `### Regarding your question about "${question}"
 
-Most projects configured with this stack run tests via standard scripts:
-\`\`\`bash
-npm test
-# or with coverage
-npm run test:coverage
-\`\`\`
-Check \`package.json\` or the project root in the **Code Explorer** tab to inspect available test scripts.`
-  }
+In ${name}:
+- Purpose: ${context.description || 'Application codebase'}
+- Stack: ${tech}
 
-  // General helpful response
-  return `### Response for **${name}**
-
-Regarding your query about *"${question}"*:
-
-Based on the repository analysis:
-- **Project Purpose:** ${context.description || 'Modular open-source framework'}
-- **Detected Stack:** ${tech}
-- **Pointers:**
-  1. Inspect the **Code Explanation** tab for an in-depth conceptual breakdown.
-  2. Explore the **Architecture Flow** tab for the structural blueprint.
-  3. Browse specific files in the **Code Explorer** tab.
-
-*(Tip: You can add an API key in the settings drawer to enable live generative Q&A across the entire codebase!)*`
+You can browse specific files in the Code Explorer tab or review the full summary in the Explanation tab.`
 }
 
-/* Callers */
 async function chatWithGrok(systemPrompt, messages, apiKey) {
   const res = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',
@@ -181,7 +151,7 @@ async function chatWithGrok(systemPrompt, messages, apiKey) {
     body: JSON.stringify({
       model: 'grok-beta',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      temperature: 0.7,
+      temperature: 0.6,
       max_tokens: 1500,
     }),
     signal: AbortSignal.timeout(18000),
@@ -207,7 +177,7 @@ async function chatWithGemini(systemPrompt, messages, apiKey, model) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents,
-        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 },
+        generationConfig: { temperature: 0.6, maxOutputTokens: 1500 },
       }),
       signal: AbortSignal.timeout(18000),
     }
@@ -224,7 +194,7 @@ async function chatWithDeepSeek(systemPrompt, messages, apiKey) {
     body: JSON.stringify({
       model: 'deepseek-chat',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      temperature: 0.7,
+      temperature: 0.6,
       max_tokens: 1500,
     }),
     signal: AbortSignal.timeout(18000),
@@ -245,7 +215,7 @@ async function chatWithOpenRouter(systemPrompt, messages, apiKey) {
     body: JSON.stringify({
       model: 'meta-llama/llama-3.2-3b-instruct:free',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      temperature: 0.7,
+      temperature: 0.6,
       max_tokens: 1500,
     }),
     signal: AbortSignal.timeout(18000),

@@ -1,20 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 
-function getFileIcon(filename) {
-  const ext = filename.split('.').pop()?.toLowerCase()
-  if (['js', 'mjs', 'cjs'].includes(ext)) return '🟡'
-  if (['jsx', 'tsx'].includes(ext)) return '⚛️'
-  if (['ts'].includes(ext)) return '🔷'
-  if (['py'].includes(ext)) return '🐍'
-  if (['json', 'yaml', 'yml', 'toml'].includes(ext)) return '⚙️'
-  if (['css', 'scss', 'less'].includes(ext)) return '🎨'
-  if (['html'].includes(ext)) return '🌐'
-  if (['md', 'txt', 'rst'].includes(ext)) return '📄'
-  if (['go'].includes(ext)) return '🐹'
-  if (['rs'].includes(ext)) return '🦀'
-  if (['java', 'kt'].includes(ext)) return '☕'
-  if (['dockerfile', 'dockerignore'].includes(filename.toLowerCase())) return '🐳'
-  return '📝'
+function getFileBadge(filename, type) {
+  if (type === 'directory') return 'DIR'
+  const ext = filename.split('.').pop()?.toUpperCase() || 'FILE'
+  return ext.slice(0, 4)
 }
 
 export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
@@ -27,14 +16,12 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
   const [explaining, setExplaining] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  // Filter files by query
   const filteredTree = useMemo(() => {
     if (!filterQuery.trim()) return fileTree
     const q = filterQuery.toLowerCase()
     return fileTree.filter(item => item.path.toLowerCase().includes(q))
   }, [fileTree, filterQuery])
 
-  // Select first file automatically if none selected
   useEffect(() => {
     if (!selectedPath && fileTree.length > 0) {
       const firstFile = fileTree.find(f => f.type === 'file') || fileTree[0]
@@ -58,7 +45,7 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
 
       const res = await fetch(`/api/file?${params.toString()}`)
       if (!res.ok) {
-        throw new Error(`File load failed (HTTP ${res.status})`)
+        throw new Error(`Failed to load file (HTTP ${res.status})`)
       }
 
       const data = await res.json()
@@ -93,7 +80,7 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
       const data = await res.json()
       setFileExplanation(data.explanation || 'No explanation returned.')
     } catch (err) {
-      setFileExplanation(`⚠️ Could not explain this file: ${err.message}`)
+      setFileExplanation(`Unable to explain file: ${err.message}`)
     } finally {
       setExplaining(false)
     }
@@ -111,20 +98,19 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
 
   return (
     <div className="explorer-container">
-      {/* Left Column: File Tree */}
-      <aside className="explorer-sidebar" aria-label="Repository files">
+      {/* Sidebar: File Tree */}
+      <aside className="explorer-sidebar">
         <div className="tree-header">
-          <span className="tree-title">📁 Repository Files</span>
-          <span className="file-count-badge">{fileTree.length} items</span>
+          <span className="tree-title">Files</span>
+          <span className="file-count-badge">{fileTree.length}</span>
         </div>
 
         <div className="tree-search">
           <input
             type="search"
-            placeholder="Filter files (e.g. package, api, src)..."
+            placeholder="Filter files..."
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            aria-label="Filter repository files"
           />
         </div>
 
@@ -139,8 +125,8 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
               onClick={() => item.type === 'file' && handleFileSelect(item.path)}
               disabled={item.type === 'directory'}
             >
-              <span className="tree-icon">
-                {item.type === 'directory' ? '📁' : getFileIcon(item.path)}
+              <span className="file-type-badge">
+                {getFileBadge(item.path, item.type)}
               </span>
               <span className="tree-name" title={item.path}>
                 {item.path}
@@ -150,17 +136,16 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
 
           {filteredTree.length === 0 && (
             <div className="empty-tree-state">
-              No files matching "{filterQuery}"
+              No files found
             </div>
           )}
         </div>
       </aside>
 
-      {/* Right Column: Code Viewer */}
+      {/* Main View: Code */}
       <main className="explorer-main">
         {selectedPath ? (
           <>
-            {/* File metadata & action bar */}
             <header className="file-toolbar">
               <div className="file-breadcrumbs">
                 <span className="repo-crumb">{repoMeta?.repo || 'repo'}</span>
@@ -176,7 +161,7 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
                   onClick={handleCopyCode}
                   disabled={fileLoading || !fileContent}
                 >
-                  {copied ? '✓ Copied' : '📋 Copy Code'}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
 
                 <button
@@ -185,7 +170,7 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
                   onClick={handleExplainFile}
                   disabled={fileLoading || explaining || !fileContent}
                 >
-                  {explaining ? 'Analyzing...' : '🧠 Explain File'}
+                  {explaining ? 'Explaining...' : 'Explain File'}
                 </button>
 
                 <a
@@ -193,18 +178,16 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
                   target="_blank"
                   rel="noreferrer"
                   className="btn-tool"
-                  title="Open on GitHub"
                 >
-                  ↗ GitHub
+                  View on GitHub
                 </a>
               </div>
             </header>
 
-            {/* AI File Explanation Card if triggered */}
             {fileExplanation && (
-              <div className="file-ai-explanation" role="region" aria-label="AI File Explanation">
+              <div className="file-ai-explanation">
                 <div className="ai-explanation-header">
-                  <span>🧠 AI File Breakdown: <code>{selectedPath.split('/').pop()}</code></span>
+                  <span>File Explanation: <code>{selectedPath.split('/').pop()}</code></span>
                   <button type="button" className="close-btn" onClick={() => setFileExplanation('')}>✕</button>
                 </div>
                 <div className="ai-explanation-content">
@@ -215,16 +198,15 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
               </div>
             )}
 
-            {/* Code Content View */}
             <div className="code-content-wrapper">
               {fileLoading ? (
                 <div className="loading-state">
                   <span className="spinner" aria-hidden="true"></span>
-                  <p>Fetching file contents from GitHub...</p>
+                  <p>Loading file...</p>
                 </div>
               ) : fileError ? (
                 <div className="error-state">
-                  <p>⚠️ {fileError}</p>
+                  <p>{fileError}</p>
                 </div>
               ) : (
                 <div className="code-editor-view">
@@ -242,8 +224,7 @@ export default function CodeExplorer({ repoMeta, fileTree = [], apiKeys }) {
           </>
         ) : (
           <div className="empty-state">
-            <span className="empty-icon">📁</span>
-            <p>Select any file from the file tree on the left to inspect its contents and request an AI explanation.</p>
+            <p>Select a file from the list to view its code and explanation.</p>
           </div>
         )}
       </main>

@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 
 const SUGGESTED_QUESTIONS = [
-  '🚀 How do I run and test this locally?',
-  '🏗 Explain the architecture flow and data lifecycle',
-  '📦 What are the core dependencies and tech stack?',
-  '🔍 What is the primary entry point file?',
-  '💡 What real-world problem does this solve best?',
+  'How do I run this locally?',
+  'What problem does this project solve?',
+  'Explain the system architecture.',
+  'What are the core dependencies?',
 ]
 
 export default function Chatbot({ repoMeta, techStack, explanation, architecture, apiKeys }) {
@@ -13,17 +12,13 @@ export default function Chatbot({ repoMeta, techStack, explanation, architecture
     {
       id: 'welcome',
       role: 'assistant',
-      content: `Hello! I'm your AI codebase assistant for **${repoMeta?.fullName || 'this repository'}**. 
+      content: `Hello. I can answer questions about the **${repoMeta?.fullName || 'this repository'}** codebase.
 
-I can explain any part of the project, walk you through local setup, analyze specific files, or clarify architectural decisions. 
-
-Try asking one of the suggested questions below, or ask anything you'd like!`,
-      provider: 'Assistant',
+You can ask about local setup, architectural design, specific files, or dependencies.`,
     },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [copiedId, setCopiedId] = useState(null)
   const chatEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -58,7 +53,6 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
           ...(apiKeys?.grok && { 'x-grok-key': apiKeys.grok }),
           ...(apiKeys?.openrouter && { 'x-openrouter-key': apiKeys.openrouter }),
           ...(apiKeys?.deepseek && { 'x-deepseek-key': apiKeys.deepseek }),
-          ...(apiKeys?.huggingface && { 'x-huggingface-key': apiKeys.huggingface }),
         },
         body: JSON.stringify({
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
@@ -87,7 +81,6 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
           id: `bot-${Date.now()}`,
           role: 'assistant',
           content: data.message || 'No response generated.',
-          provider: data.provider || 'AI Assistant',
         },
       ])
     } catch (err) {
@@ -96,7 +89,7 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: `⚠️ Failed to get answer: ${err.message}. Please check your connection or API keys.`,
+          content: `Unable to get response: ${err.message}. Please check your connection or settings.`,
           isError: true,
         },
       ])
@@ -112,24 +105,17 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
     }
   }
 
-  const handleCopy = (text, id) => {
-    navigator.clipboard.writeText(text)
-    setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 2000)
-  }
-
   const handleClear = () => {
     setMessages([
       {
         id: 'welcome-reset',
         role: 'assistant',
-        content: `Chat cleared. Ask me anything about **${repoMeta?.fullName || 'this repository'}**!`,
+        content: `Chat cleared. Ask anything about **${repoMeta?.fullName || 'this repository'}**.`,
       },
     ])
   }
 
-  // Render markdown-like simple paragraphs and code blocks safely
-  const renderMessageContent = (content, messageId) => {
+  const renderMessageContent = (content) => {
     const parts = content.split(/(```[\s\S]*?```)/g)
 
     return parts.map((part, index) => {
@@ -142,13 +128,6 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
           <div key={index} className="chat-code-wrapper">
             <div className="chat-code-header">
               <span className="code-lang">{language}</span>
-              <button
-                type="button"
-                className="btn-copy-code"
-                onClick={() => handleCopy(codeText, `${messageId}-${index}`)}
-              >
-                {copiedId === `${messageId}-${index}` ? '✓ Copied' : '📋 Copy'}
-              </button>
             </div>
             <pre className="chat-code-block">
               <code>{codeText}</code>
@@ -157,7 +136,6 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
         )
       }
 
-      // Format bold text and lists cleanly
       return (
         <div key={index} className="chat-prose">
           {part.split('\n\n').map((para, pIdx) => {
@@ -186,23 +164,20 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
 
   return (
     <div className="chatbot-container">
-      {/* Chat header bar */}
+      {/* Header bar */}
       <div className="chat-header">
         <div className="chat-meta">
-          <span className="chat-avatar-bot">🤖</span>
-          <div>
-            <span className="chat-title">Repository Q&A Assistant</span>
-            <span className="chat-sub">Context: {repoMeta?.fullName || 'Active Repository'}</span>
-          </div>
+          <span className="chat-title">Repository Q&A</span>
+          <span className="chat-sub">{repoMeta?.fullName || 'Active Repository'}</span>
         </div>
-        <button type="button" className="btn-tool text-danger" onClick={handleClear} title="Clear Conversation">
-          🗑 Clear Chat
+        <button type="button" className="btn-tool text-muted" onClick={handleClear}>
+          Clear
         </button>
       </div>
 
-      {/* Suggested prompts pills */}
-      <div className="suggested-prompts" aria-label="Suggested questions">
-        <span className="prompt-label">Quick Questions:</span>
+      {/* Suggested prompts */}
+      <div className="suggested-prompts">
+        <span className="prompt-label">Suggested:</span>
         <div className="prompt-chips">
           {SUGGESTED_QUESTIONS.map((q, idx) => (
             <button
@@ -218,25 +193,22 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
         </div>
       </div>
 
-      {/* Messages area */}
+      {/* Messages thread */}
       <div className="chat-messages" role="log" aria-live="polite">
         {messages.map((m) => (
           <div key={m.id} className={`chat-message ${m.role} ${m.isError ? 'error-bubble' : ''}`}>
-            <div className="message-avatar">
-              {m.role === 'user' ? '👤' : '🤖'}
+            <div className="message-label">
+              {m.role === 'user' ? 'You' : 'Assistant'}
             </div>
             <div className="message-content">
-              {renderMessageContent(m.content, m.id)}
-              {m.provider && (
-                <span className="message-provider-tag">Generated by {m.provider}</span>
-              )}
+              {renderMessageContent(m.content)}
             </div>
           </div>
         ))}
 
         {loading && (
           <div className="chat-message assistant">
-            <div className="message-avatar">🤖</div>
+            <div className="message-label">Assistant</div>
             <div className="message-content typing-indicator">
               <span></span>
               <span></span>
@@ -247,7 +219,7 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
         <div ref={chatEndRef} />
       </div>
 
-      {/* Input form */}
+      {/* Input */}
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -255,21 +227,20 @@ Try asking one of the suggested questions below, or ask anything you'd like!`,
         }}
         className="chat-input-form"
       >
-        <textarea
-          rows={2}
+        <input
+          type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={`Ask anything about ${repoMeta?.repo || 'this repository'}... (Press Enter to send)`}
+          placeholder="Ask a question about this repository..."
           disabled={loading}
         />
         <button
           type="submit"
           className="btn-chat-send"
           disabled={loading || !input.trim()}
-          aria-label="Send message"
         >
-          {loading ? 'Thinking...' : 'Send ➤'}
+          {loading ? 'Sending...' : 'Send'}
         </button>
       </form>
     </div>
