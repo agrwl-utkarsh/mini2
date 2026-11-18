@@ -1,26 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 
 export default function CodeExplanation({ explanation, repoMeta, techStack = [], highlights = [] }) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(explanation || '')
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const handleDownload = () => {
-    const markdownContent = `# ${repoMeta?.fullName || 'Repository'} - Architecture & Code Explanation\n\n${explanation}`
-    const blob = new Blob([markdownContent], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${repoMeta?.repo || 'repository'}-explanation.md`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  // Parse markdown-like blocks for clean presentation
   const renderedSections = useMemo(() => {
     if (!explanation) return null
     const blocks = explanation.split(/(```[\s\S]*?```)/g)
@@ -41,7 +21,6 @@ export default function CodeExplanation({ explanation, repoMeta, techStack = [],
         )
       }
 
-      // Process standard markdown headings and paragraphs
       return (
         <div key={idx} className="explanation-text-block">
           {block.split('\n\n').map((para, pIdx) => {
@@ -81,43 +60,34 @@ export default function CodeExplanation({ explanation, repoMeta, techStack = [],
 
   return (
     <div className="explanation-wrapper">
-      {/* Executive Summary Card */}
-      <section className="executive-card" aria-label="Executive Summary">
+      {/* Overview summary */}
+      <section className="executive-card">
         <div className="executive-header">
-          <h3>⚡ Executive Summary</h3>
-          <div className="explanation-actions">
-            <button type="button" className="btn-tool" onClick={handleCopy}>
-              {copied ? '✓ Copied' : '📋 Copy Text'}
-            </button>
-            <button type="button" className="btn-tool" onClick={handleDownload}>
-              📥 Download .md
-            </button>
-          </div>
+          <h3>Overview</h3>
         </div>
 
-        {/* Tech Stack Badges */}
+        {/* Tech Stack */}
         {techStack.length > 0 && (
           <div className="tech-stack-row">
-            <span className="row-label">Detected Stack:</span>
+            <span className="row-label">Technologies:</span>
             <div className="tech-tags">
               {techStack.map((t, idx) => (
                 <span key={idx} className="tech-pill">
                   {t.name}
-                  {t.category && <small className="tech-cat">({t.category})</small>}
                 </span>
               ))}
             </div>
           </div>
         )}
 
-        {/* Key Highlights */}
+        {/* Key Takeaways */}
         {highlights.length > 0 && (
           <div className="highlights-box">
-            <span className="row-label">Key Architectural Takeaways:</span>
+            <span className="row-label">Summary:</span>
             <ul className="highlight-bullets">
               {highlights.map((h, idx) => (
                 <li key={idx}>
-                  <span className="bullet-check">✓</span> {h}
+                  <span className="bullet-dot">•</span> {h}
                 </li>
               ))}
             </ul>
