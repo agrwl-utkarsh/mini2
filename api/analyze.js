@@ -20,15 +20,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const readme = await fetchReadme(owner, repo)
-    const explanation = await explainReadme(readme)
+    const repository = await fetchRepository(owner, repo)
+    const explanation = await explainRepository(repository)
     return res.status(200).json({ explanation })
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }
 }
 
-async function fetchReadme(owner, repo) {
+async function fetchRepository(owner, repo) {
   const paths = ['README.md', 'README.txt', 'README.rst', 'readme.md']
   const branches = ['main', 'master']
 
@@ -45,23 +45,23 @@ async function fetchReadme(owner, repo) {
       }
     }
   }
-  throw new Error('README not found in repo')
+  throw new Error('Repository content not found')
 }
 
-async function explainReadme(readme) {
-  // Truncate very long READMEs to avoid token limits and copying
-  const maxReadmeLength = 8000
-  const truncatedReadme = readme.length > maxReadmeLength 
-    ? readme.slice(0, maxReadmeLength) + '\n\n[README truncated for length...]'
-    : readme
+async function explainRepository(repository) {
+  // Truncate very long repository content to avoid token limits and copying
+  const maxRepositoryLength = 8000
+  const truncatedRepository = repository.length > maxRepositoryLength 
+    ? repository.slice(0, maxRepositoryLength) + '\n\n[Repository content truncated for length...]'
+    : repository
 
   const prompt = `You are a senior software engineer mentoring a junior developer. Your task is to explain this GitHub repository in a way that teaches them something new.
 
 ⚠️ CRITICAL RULES:
-- DO NOT copy, quote, or paraphrase the README directly
-- DO NOT output the README content in any form
+- DO NOT copy, quote, or paraphrase the repository content directly
+- DO NOT output the repository content in any form
 - DO NOT use bullet points or numbered lists
-- DO NOT summarize the README section-by-section
+- DO NOT summarize the repository section-by-section
 - Write ONLY in flowing, natural PARAGRAPHS (minimum 5-6 paragraphs)
 - Explain concepts in YOUR OWN WORDS as if teaching face-to-face
 
@@ -87,8 +87,8 @@ Style: Conversational, encouraging, like a code review with a junior dev. Use "y
 ✅ GOOD EXAMPLE (what TO do):
 "Imagine you're building a React app and you keep passing props down three levels just to share a simple toggle state. Frustrating, right? That's exactly the problem this library solves. Instead of threading props through every component, you wrap your app in a provider once, and any component can read or update the state directly. It's like having a shared whiteboard in the room instead of passing notes through intermediaries. The core idea uses React Context under the hood — that's React's built-in way to share data without props — but this library handles all the boilerplate so you don't have to. You'd use this when your app has several components that need the same data, like a theme toggle, user authentication status, or a shopping cart. Getting started takes two minutes: install it, wrap your root component, and you're off. No complex configuration needed unless you want it."
 
-README to explain (do not copy from this):
-${truncatedReadme}`
+Repository content to explain (do not copy from this):
+${truncatedRepository}`
 
   const errors = []
   const detectedKeys = []
@@ -195,7 +195,7 @@ ${truncatedReadme}`
 
   // All providers failed - return debug info
   const debugInfo = `\n\n---\nDEBUG: Detected keys: ${detectedKeys.join(', ') || 'NONE'}\nErrors:\n${errors.map(e => `• ${e}`).join('\n') || '• No providers attempted (no keys detected)'}`
-  return 'README content:\n\n' + readme.slice(0, 3000) + '\n\n(AI explanation unavailable' + debugInfo + ')'
+  return 'Repository content:\n\n' + repository.slice(0, 3000) + '\n\n(AI explanation unavailable' + debugInfo + ')'
 }
 
 async function callGrok(prompt, apiKey) {
