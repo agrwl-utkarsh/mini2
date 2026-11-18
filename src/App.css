@@ -440,6 +440,7 @@ body {
 /* Tab Panels */
 .tab-panels {
   animation: fadeInUp 0.3s var(--transition-fast);
+  height: 600px;
 }
 
 .empty-state,
