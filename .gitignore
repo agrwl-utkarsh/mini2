@@ -47,3 +47,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Generated synopsis working files
+_toc_pages.json
+__pycache__/
