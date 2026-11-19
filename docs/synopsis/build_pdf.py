@@ -20,6 +20,19 @@ from reportlab.platypus import (
     BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer, Table, TableStyle,
     Image, PageBreak, KeepTogether,
 )
+
+
+class FitImage(Image):
+    """Image that scales down to the available width, never up."""
+    def __init__(self, path, max_w, max_h=None):
+        from PIL import Image as PILImage
+        with PILImage.open(path) as im:
+            iw, ih = im.size
+        w, h = max_w, max_w * ih / iw
+        if max_h and h > max_h:
+            h = max_h
+            w = max_h * iw / ih
+        super().__init__(path, width=w, height=h)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.fonts import addMapping
@@ -205,14 +218,10 @@ for idx, (kind, obj) in enumerate(blocks):
             path = img_paths[img_i]
             with PILImage.open(path) as im:
                 iw, ih = im.size
-            target_w = FRAME_W
-            target_h = target_w * ih / iw
-            max_h = H - TM - BM - 1.2 * inch
-            if target_h > max_h:
-                target_h = max_h
-                target_w = target_h * iw / ih
+            target_w = FRAME_W - 6          # small safety gutter
+            max_h = H - TM - BM - 1.35 * inch
             story.append(Spacer(1, 6))
-            story.append(Image(path, width=target_w, height=target_h))
+            story.append(FitImage(path, target_w, max_h))
             img_i += 1
         continue
 
@@ -299,7 +308,27 @@ for idx, (kind, obj) in enumerate(blocks):
 
     # ── headings
     if bold and size >= 13:
-        story.append(KeepTogether([Paragraph(esc(text), H1)]))
+        if "\t" in text:
+            # "1.<tab>INTRODUCTION" -> number left, title centred (reference layout)
+            left_txt, _, right_txt = text.partition("\t")
+            head = Table(
+                [[Paragraph(esc(left_txt.strip()),
+                            ParagraphStyle("hn", fontName="Serif-Bold", fontSize=13.5,
+                                           alignment=TA_LEFT, leading=18)),
+                  Paragraph(esc(right_txt.strip()),
+                            ParagraphStyle("ht", fontName="Serif-Bold", fontSize=13.5,
+                                           alignment=TA_CENTER, leading=18))]],
+                colWidths=[0.75 * inch, FRAME_W - 0.75 * inch], hAlign="LEFT")
+            head.setStyle(TableStyle([
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                ("VALIGN", (0, 0), (-1, -1), "BOTTOM"),
+            ]))
+            story.append(KeepTogether([head]))
+        else:
+            story.append(KeepTogether([Paragraph(esc(text), H1)]))
         continue
     if bold and size >= 12.4:
         story.append(KeepTogether([Paragraph(esc(text), H2)]))
